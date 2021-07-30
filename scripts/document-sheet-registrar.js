@@ -31,7 +31,7 @@ function _initializeJournalSheetShim() {
 
 	JournalEntry.prototype.type = "base";
 
-	libWrapper.register("_extended-journal-sheets", "JournalEntry.prototype._getSheetClass", _getSheetClass, "OVERRIDE");
+	libWrapper.register("_document-sheet-registrar", "JournalEntry.prototype._getSheetClass", _getSheetClass, "OVERRIDE");
 
 	/**
 	 * Register a sheet class as a candidate which can be used to display Journal Entries.
