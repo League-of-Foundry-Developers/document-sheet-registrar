@@ -67,7 +67,9 @@ class DocumentSheetRegistrar {
 	 * @memberof DocumentSheetRegistrar
 	 */
 	static initializeDocumentSheet(doc) {
+		// Skip Folder because it has types already and doesn't seem that useful
 		if (doc.name == "Folder") return;
+		
 		// Set the base type for this document class
 		doc.class.prototype.type = "base";
 
