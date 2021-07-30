@@ -11,7 +11,7 @@
  * is an object of additional data.
  *
  * @example
- * Journal.registerSheet("myModule", SheetApplicationClass, {
+ * Journal.registerSheet?.("myModule", SheetApplicationClass, {
  *     types: ["base"],
  *     makeDefault: false,
  *     label: "My Journal Entry sheet"
@@ -44,7 +44,7 @@ function _initializeJournalSheetShim() {
 	 * @param {boolean} [options.makeDefault]   Whether to make this sheet the default for provided types
 	 *
 	 * @example
-	 * Journal.registerSheet("myModule", SheetApplicationClass, {
+	 * Journal.registerSheet?.("myModule", SheetApplicationClass, {
 	 *     types: ["base"],
 	 *     makeDefault: false,
 	 *     label: "My Journal Entry sheet"
@@ -63,7 +63,7 @@ function _initializeJournalSheetShim() {
 	 * @param {string[]} [options.types]             An Array of types for which this sheet should be removed
 	 *
 	 * @example
-	 * Journal.unregisterSheet("myModule", SheetApplicationClass, {
+	 * Journal.unregisterSheet?.("myModule", SheetApplicationClass, {
 	 * 	types: ["base"],
 	 * });
 	 */

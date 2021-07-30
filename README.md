@@ -12,47 +12,53 @@
 
 
 ## API
-Once this library is active, it enables the same API that Actor and Item documents use to register and unregister sheets.
+Once this library is active (it should be activated at the start of the `init` hook), it enables the same API that Actor and Item documents use to register and unregister sheets.
 
 ### `Journal.registerSheet`
 
 Register a sheet class as a candidate which can be used to display Journal Entries.
 
-```js
-/**
- * Register a sheet class as a candidate which can be used to display Journal Entries.
- *
- * @param {string} scope            Provide a unique namespace scope for this sheet
- * @param {Application} sheetClass  A defined Application class used to render the sheet
- * @param {Object} options          Additional options used for sheet registration
- * @param {string} [options.label]          A human readable label for the sheet name, which will be localized
- * @param {string[]} [options.types]        An array of entity types for which this sheet should be used
- * @param {boolean} [options.makeDefault]   Whether to make this sheet the default for provided types
- */
-Journal.registerSheet("myModule", SheetApplicationClass, {
-	types: ["base"],
-	makeDefault: false,
-	label: "My Journal Entry sheet"
+#### Parameters
+
+| Name | Type | Description |  |
+| ---- | ---- | ----------- | -------- |
+| scope | `string`  | Provide a unique namespace scope for this sheet | &nbsp; |
+| sheetClass | `Application`  | A defined Application class used to render the sheet | &nbsp; |
+| options | `Object`  | Additional options used for sheet registration | &nbsp; |
+| options.label | `string`  | A human readable label for the sheet name, which will be localized | *Optional* |
+| options.types | `Array.<string>`  | An array of entity types for which this sheet should be used | *Optional* |
+| options.makeDefault | `boolean`  | Whether to make this sheet the default for provided types | *Optional* |
+
+#### Examples
+
+```javascript
+Journal.registerSheet?.("myModule", SheetApplicationClass, {
+  types: ["base"],
+  makeDefault: false,
+  label: "My Journal Entry sheet"
 });
 ```
-
 
 ### `Journal.unregisterSheet`
 Unregister a Journal Entry sheet class, removing it from the list of available Applications to use for Journal Entries.
 
-```js
-/**
- * Unregister a Journal Entry sheet class, removing it from the list of available Applications to use for Journal Entries.
- *
- * @param {string} scope            Provide a unique namespace scope for this sheet
- * @param {Application} sheetClass  A defined Application class used to render the sheet
- * @param {Object} [options]          Additional options used for sheet registration
- * @param {string[]} [options.types]             An Array of types for which this sheet should be removed
- */
-Journal.unregisterSheet("myModule", SheetApplicationClass, {
+#### Parameters
+
+| Name | Type | Description |  |
+| ---- | ---- | ----------- | -------- |
+| scope | `string`  | Provide a unique namespace scope for this sheet | &nbsp; |
+| sheetClass | `Application`  | A defined Application class used to render the sheet | &nbsp; |
+| options | `Object`  | Additional options used for sheet registration | *Optional* |
+| options.types | `Array.<string>`  | An Array of types for which this sheet should be removed | *Optional* |
+
+#### Examples
+
+```javascript
+Journal.unregisterSheet?.("myModule", SheetApplicationClass, {
 	types: ["base"],
 });
 ```
+
 
 ### Setting which sheet your JournalEntry opens with.
 
