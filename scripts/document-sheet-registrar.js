@@ -29,11 +29,16 @@ class DocumentSheetRegistrar {
 	 * @type {DocumentMap[]}
 	 */
 	static get documentTypes() {
-		return [
-			{ "name": "JournalEntry", "class": JournalEntry, "collection": Journal },
-			{ "name": "Macro",        "class": Macro,        "collection": Macros },
-			{ "name": "Scene",        "class": Scene,        "collection": Scenes },
-		]
+		return Object.entries(CONFIG)
+			.filter(([key, config]) => config.sheetClass && config.collection)
+			.map(([key, config]) => {
+				/** @return {DocumentMap} */
+				return { 
+					name: key,
+					class: config.documentClass,
+					collection: config.collection
+				}
+			});
 	}
 
 	
@@ -62,6 +67,7 @@ class DocumentSheetRegistrar {
 	 * @memberof DocumentSheetRegistrar
 	 */
 	static initializeDocumentSheet(doc) {
+		if (doc.name == "Folder") return;
 		// Set the base type for this document class
 		doc.class.prototype.type = "base";
 
