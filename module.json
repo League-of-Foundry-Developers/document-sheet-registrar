@@ -20,7 +20,8 @@
 		}
 	],
 	"scripts": [
-		"/scripts/module.js"
+		"/scripts/libWrapperShim.js",
+		"/scripts/document-sheet-registrar.js"
 	],
 	"url": "https://github.com/League-of-Foundry-Developers/document-sheet-registrar",
 	"manifest": "https://github.com/League-of-Foundry-Developers/document-sheet-registrar/releases/latest/download/module.json",
