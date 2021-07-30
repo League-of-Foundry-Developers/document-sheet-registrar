@@ -1,7 +1,7 @@
 {
-	"name": "_extended-journal-sheets",
-	"title": "extendedJournalSheets",
-	"description": "A library module which enables the registration of alternative Journal Entry sheets.",
+	"name": "_document-sheet-registrar",
+	"title": "Lib: Document Sheet Registrar",
+	"description": "A library module which enables the registration of alternative document sheets for all document types that don't normally have this capacity..",
 	"version": "1.0.0",
 	"library": true,
 	"manifestPlusVersion": "1.1.0",
@@ -10,6 +10,8 @@
 	"authors": [
 		{
 			"name": "zeel",
+			"email": "zeel02@gmail.com",
+			"discord": "zeel#4200",
 			"url": "https://github.com/zeel01"
 		},
 		{
