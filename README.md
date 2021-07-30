@@ -8,7 +8,7 @@
 - Styling a particular journal entry (or kind of entry, e.g. from a particular module) is difficult to do in a way which does not conflict with other modules.
 - Modules which alter the display of Journal Entries would like a predictable way to do so, which is hard when different modules use different approaches to work around the issues above.
 
-[This issue](https://gitlab.com/foundrynet/foundryvtt/-/issues/4994) outlines a generic request that if implemented would allow Journal (and other document) "sheets" to be registered just like Actor sheets. Our goal with this library is to allow it as a replacement for this missing API.
+[This issue](https://gitlab.com/foundrynet/foundryvtt/-/issues/4994) outlines a generic request that if implemented would allow Journal (and other document) "sheets" to be registered just like Actor sheets. Our goal with this library is to offer it as a replacement for this missing API.
 
 
 ## API
