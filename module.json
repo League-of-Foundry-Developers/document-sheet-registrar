@@ -18,14 +18,7 @@
 		}
 	],
 	"scripts": [
-		"/scripts/lib/lib.js"
-	],
-	"languages": [
-		{
-			"lang": "en",
-			"name": "English",
-			"path": "languages/en.json"
-		}
+		"/scripts/module.js"
 	],
 	"url": "https://github.com/League-of-Foundry-Developers/extended-journal-sheets",
 	"manifest": "https://github.com/League-of-Foundry-Developers/extended-journal-sheets/releases/latest/download/module.json",
