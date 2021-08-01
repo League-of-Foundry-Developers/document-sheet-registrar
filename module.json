@@ -19,8 +19,7 @@
 			"url": "https://github.com/orgs/ElfFriend-DnD"
 		}
 	],
-	"scripts": [
-		"/scripts/libWrapperShim.js",
+	"esmodules": [
 		"/scripts/document-sheet-registrar.js"
 	],
 	"url": "https://github.com/League-of-Foundry-Developers/document-sheet-registrar",

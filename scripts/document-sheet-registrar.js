@@ -1,3 +1,5 @@
+import { libWrapper } from './libWrapperShim.js'
+
 /**
  * Creates a shim that allows for the registration of custom document sheets.
  *
@@ -33,7 +35,7 @@ class DocumentSheetRegistrar {
 			.filter(([key, config]) => config.sheetClass && config.collection)
 			.map(([key, config]) => {
 				/** @return {DocumentMap} */
-				return { 
+				return {
 					name: key,
 					class: config.documentClass,
 					collection: config.collection
@@ -41,7 +43,7 @@ class DocumentSheetRegistrar {
 			});
 	}
 
-	
+
 	/**
 	 * Initialize all of the document sheet registrars.
 	 *
@@ -52,14 +54,14 @@ class DocumentSheetRegistrar {
 		for (let doc of this.documentTypes) {
 			// Skip any collection that already has a sheet registration method
 			if (doc.collection.registerSheet) continue;
-			
+
 			this.initializeDocumentSheet(doc);
 		}
 	}
 
-	
+
 	/**
-	 * Set up the nessesary configuration objects and methods for 
+	 * Set up the nessesary configuration objects and methods for
 	 * sheet registration of this document type.
 	 *
 	 * @static
@@ -69,7 +71,7 @@ class DocumentSheetRegistrar {
 	static initializeDocumentSheet(doc) {
 		// Skip Folder because it has types already and doesn't seem that useful
 		if (doc.name == "Folder") return;
-		
+
 		// Set the base type for this document class
 		doc.class.prototype.type = "base";
 
@@ -83,7 +85,7 @@ class DocumentSheetRegistrar {
 		this.configureSheetClasses(doc);
 	}
 
-	
+
 	/**
 	 * Creates a new sheetClasses config object for this document type.
 	 *
@@ -102,7 +104,7 @@ class DocumentSheetRegistrar {
 			}
 		}
 	}
-	
+
 	/**
 	 * Adds a register and unregister method to the document collection.
 	 *
@@ -149,12 +151,12 @@ class DocumentSheetRegistrar {
 		}
 	}
 
-	
+
 	/**
 	 * Retrieve the sheet class for the document. @see Actor._getSheetClass
 	 *
 	 * @static
-	 * @return {*} 
+	 * @return {*}
 	 * @memberof DocumentSheetRegistrar
 	 */
 	static _getSheetClass() {
