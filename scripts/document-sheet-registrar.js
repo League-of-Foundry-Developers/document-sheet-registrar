@@ -103,6 +103,14 @@ class DocumentSheetRegistrar {
 				}
 			}
 		}
+
+		// links the old sheetClass definition to the new 'base' default sheet definition
+		// big thanks to fvtt-lib-wrapper Rui Pinheiro for inspiring this
+		Object.defineProperty(CONFIG[doc.name], 'sheetClass', {
+			get: () => CONFIG[doc.name].sheetClasses['base'][doc.name].cls,
+			set: (value) => { CONFIG[doc.name].sheetClasses['base'][doc.name].cls = value },
+			configurable: false
+		});
 	}
 
 	/**
