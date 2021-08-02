@@ -83,13 +83,16 @@ class DocumentSheetRegistrar {
 
 		// Configure the sheetClasses object for this document type
 		this.configureSheetClasses(doc);
+
+		// Redirect sheetClass
+		this.redirectSheetClass(doc);
 	}
 
 
 	/**
 	 * Creates a new sheetClasses config object for this document type.
 	 *
-	 * @param {*} doc - The type of document to add a config object for
+	 * @param {DocumentMap} doc - The type of document to add a config object for
 	 * @memberof DocumentSheetRegistrar
 	 */
 	static configureSheetClasses(doc) {
@@ -102,10 +105,20 @@ class DocumentSheetRegistrar {
 					cls: CONFIG[doc.name].sheetClass
 				}
 			}
-		}
+		}		
+	}
 
-		// links the old sheetClass definition to the new 'base' default sheet definition
-		// big thanks to fvtt-lib-wrapper Rui Pinheiro for inspiring this
+
+	/**
+	 * Links the old sheetClass definition to the new 'base' default sheet definition
+	 *
+	 * big thanks to fvtt-lib-wrapper Rui Pinheiro for inspiring this
+	 *
+	 * @static
+	 * @param {DocumentMap} doc - The type of document to modify
+	 * @memberof DocumentSheetRegistrar
+	 */
+	static redirectSheetClass(doc) {
 		Object.defineProperty(CONFIG[doc.name], 'sheetClass', {
 			get: () => CONFIG[doc.name].sheetClasses['base'][doc.name].cls,
 			set: (value) => { CONFIG[doc.name].sheetClasses['base'][doc.name].cls = value },
@@ -113,10 +126,11 @@ class DocumentSheetRegistrar {
 		});
 	}
 
+
 	/**
 	 * Adds a register and unregister method to the document collection.
 	 *
-	 * @param {*} doc
+	 * @param {DocumentMap} doc
 	 * @memberof DocumentSheetRegistrar
 	 */
 	static addRegistrationMethods(doc) {
