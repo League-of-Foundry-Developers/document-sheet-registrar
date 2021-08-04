@@ -57,6 +57,9 @@ class DocumentSheetRegistrar {
 
 			this.initializeDocumentSheet(doc);
 		}
+
+		// Add a sheet config event handler for header buttons on DocumentSheet
+		DocumentSheet.prototype._onConfigureSheet = this._onConfigureSheet;
 	}
 
 
@@ -174,6 +177,9 @@ class DocumentSheetRegistrar {
 	}
 
 
+	/*********************************************************************************************/
+
+
 	/**
 	 * Retrieve the sheet class for the document. @see Actor._getSheetClass
 	 *
@@ -189,6 +195,18 @@ class DocumentSheetRegistrar {
 		const classes = Object.values(sheets);
 		if (!classes.length) return null;
 		return (classes.find(s => s.default) ?? classes.pop()).cls;
+	}
+
+	/**
+	 * Handle requests to configure the default sheet used by this Document
+	 * @private
+	 */
+	static _onConfigureSheet(event) {
+		event.preventDefault();
+		new EntitySheetConfig(this.object, {
+			top: this.position.top + 40,
+			left: this.position.left + ((this.position.width - 400) / 2)
+		}).render(true);
 	}
 }
 
