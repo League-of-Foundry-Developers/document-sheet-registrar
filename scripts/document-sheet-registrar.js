@@ -20,7 +20,7 @@ import { libWrapper } from './libWrapperShim.js'
  * });
  *
  */
-class DocumentSheetRegistrar {
+export default class DocumentSheetRegistrar {
 	/**
 	 * @typedef {object} DocumentMap A map of document name, class, and collection
 	 * @property {string}              name       - The name of the document
