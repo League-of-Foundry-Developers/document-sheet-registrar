@@ -247,5 +247,8 @@ class DocumentSheetRegistrar {
 	}
 }
 
+// On init, create the nessesary configs and methods to enable the sheet config API
 Hooks.once("init", DocumentSheetRegistrar.initializeDocumentSheets.bind(DocumentSheetRegistrar));
+
+// When a doc sheet is rendered, add a header button for sheet configuration
 Hooks.on("getDocumentSheetHeaderButtons", DocumentSheetRegistrar.getDocumentSheetHeaderButtons.bind(DocumentSheetRegistrar));
