@@ -134,10 +134,6 @@ export default class DocumentSheetRegistrar {
 			this.object.data.type = this.object.type;
 			return wrapped(...args);	
 		}, "WRAPPER");
-
-
-		// NEEDS TO HAPPEN EARLIER IN THE FLOW, POSSIBLY PRE-INIT
-		libWrapper.register("_document-sheet-registrar", "EntitySheetConfig.updateDefaultSheets", this.updateDefaultSheets, "OVERRIDE");
 	}
 
 	
@@ -358,3 +354,32 @@ Hooks.once("init", DocumentSheetRegistrar.initializeDocumentSheets.bind(Document
 
 // When a doc sheet is rendered, add a header button for sheet configuration
 Hooks.on("getDocumentSheetHeaderButtons", DocumentSheetRegistrar.getDocumentSheetHeaderButtons.bind(DocumentSheetRegistrar));
+
+Hooks.on("setup", () => {
+	libWrapper.register("_document-sheet-registrar", "EntitySheetConfig.updateDefaultSheets", DocumentSheetRegistrar.updateDefaultSheets, "OVERRIDE");
+});
+
+
+/*
+Hooks.once("init", () => {
+	//["ace/mode/javascript", "ace/ext/language_tools", "ace/ext/error_marker", "ace/theme/twilight", "ace/snippets/javascript"].forEach((s) => ace.config.loadModule(s));
+
+	Macros.registerSheet?.("macroeditor", AceMacroConfig, {
+		makeDefault: true,
+		label: "test",
+		types: ["script", "chat"]
+	});
+});
+
+
+class AceMacroConfig extends MacroConfig {
+	activateListeners(configElement) {
+		console.log(this);
+	}
+
+	getData() {
+		const data = super.getData();
+		console.debug(data);
+		return data;
+	}
+}*/
