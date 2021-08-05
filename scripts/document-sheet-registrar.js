@@ -22,6 +22,16 @@ import { libWrapper } from './libWrapperShim.js'
  */
 export default class DocumentSheetRegistrar {
 	/**
+	 * The name of the Document Sheet Registrar module module
+	 *
+	 * @type {string} 
+	 * @readonly
+	 * @static
+	 * @memberof DocumentSheetRegistrar
+	 */
+	static get name() { return "_document-sheet-registrar"; }
+
+	/**
 	 * @typedef {object} DocumentMap A map of document name, class, and collection
 	 * @property {string}              name       - The name of the document
 	 * @property {ClientDocumentMixin} class      - The class of the document
