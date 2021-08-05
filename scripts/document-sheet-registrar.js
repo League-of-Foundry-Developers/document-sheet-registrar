@@ -132,16 +132,24 @@ class DocumentSheetRegistrar {
 	 * @memberof DocumentSheetRegistrar
 	 */
 	static configureSheetClasses(doc) {
-		CONFIG[doc.name].sheetClasses = {
-			"base": {                                // "base" because these documents only have one type
-				[doc.name]: {                        // Register the default sheet
-					id: doc.name,
-					default: true,                   // As the default
-					label: doc.name,
-					cls: CONFIG[doc.name].sheetClass
-				}
+		this.configureSheetClassessByType(doc, "base");
+	/**
+	 * Creates a new sheetClasses config object for this document and type.
+	 *
+	 * @static
+	 * @param {DocumentMap} doc  - The kind of document to add a config object for
+	 * @param {string}      type - The name of the "type" for this document
+	 * @memberof DocumentSheetRegistrar
+	 */
+	static configureSheetClassessByType(doc, type) {
+		CONFIG[doc.name].sheetClasses[type] = {                                
+			[doc.name]: {                        // Register the default sheet
+				id: doc.name,
+				default: true,                   // As the default
+				label: doc.name,
+				cls: CONFIG[doc.name].sheetClass
 			}
-		}		
+		}
 	}
 
 
