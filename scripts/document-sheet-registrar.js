@@ -135,7 +135,7 @@ export default class DocumentSheetRegistrar {
 		// If there are not multiple types
 		if (!doc.class.metadata.types.length)  { 
 			// Set the "base" type for this document class
-			doc.class.prototype.type = "base"; 
+			doc.class.prototype.type = CONST.BASE_ENTITY_TYPE;
 
 			// And do nothing else
 			return;
@@ -170,7 +170,7 @@ export default class DocumentSheetRegistrar {
 		}
 
 		// "base" for documents that only have one type
-		this.configureSheetClassessByType(doc, "base");
+		this.configureSheetClassessByType(doc, CONST.BASE_ENTITY_TYPE);
 	}
 
 
@@ -207,10 +207,10 @@ export default class DocumentSheetRegistrar {
 	static redirectSheetClass(doc) {
 		Object.defineProperty(CONFIG[doc.name], "sheetClass", {
 			get: function() { 
-				return CONFIG[doc.name].sheetClasses["base"][doc.name].cls 
+				return CONFIG[doc.name].sheetClasses[CONST.BASE_ENTITY_TYPE][doc.name].cls
 			},
 			set: function (value) { 
-				CONFIG[doc.name].sheetClasses["base"][doc.name].cls = value 
+				CONFIG[doc.name].sheetClasses[CONST.BASE_ENTITY_TYPE][doc.name].cls = value
 			},
 			configurable: false
 		});
