@@ -129,6 +129,15 @@ export default class DocumentSheetRegistrar {
 
 		// Redirect sheetClass
 		this.redirectSheetClass(doc);
+
+		libWrapper.register("_document-sheet-registrar", "EntitySheetConfig.prototype.getData", function(wrapped, ...args) {
+			this.object.data.type = this.object.type;
+			return wrapped(...args);	
+		}, "WRAPPER");
+
+
+		// NEEDS TO HAPPEN EARLIER IN THE FLOW, POSSIBLY PRE-INIT
+		libWrapper.register("_document-sheet-registrar", "EntitySheetConfig.updateDefaultSheets", this.updateDefaultSheets, "OVERRIDE");
 	}
 
 	
@@ -312,6 +321,35 @@ export default class DocumentSheetRegistrar {
 			top: this.position.top + 40,
 			left: this.position.left + ((this.position.width - 400) / 2)
 		}).render(true);
+	}
+
+	/**
+	 * Update the currently default Sheets using a new core world setting
+	 * @param {object} setting
+	 */
+	static updateDefaultSheets(setting = {}) {
+		if (!Object.keys(setting).length) return;
+		const documents = DocumentSheetRegistrar.documentTypes.map(doc => doc.name);
+		for (let documentName of documents) {
+			const cfg = CONFIG[documentName];
+			const classes = cfg.sheetClasses;
+			const collection = cfg.collection.instance;
+			let defaults = setting[documentName] || {};
+			if (!defaults) continue;
+
+			// Update default preference for registered sheets
+			for (let [type, sheetId] of Object.entries(defaults)) {
+				const sheets = Object.values(classes[type] || {});
+				let requested = sheets.find(s => s.id === sheetId);
+				if (requested) sheets.forEach(s => s.default = s.id === sheetId);
+			}
+
+			// Close and de-register any existing sheets
+			for (let document of collection) {
+				Object.values(document.apps).forEach(app => app.close());
+				document.apps = {};
+			}
+		}
 	}
 }
 
