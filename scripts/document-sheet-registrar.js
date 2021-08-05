@@ -126,13 +126,26 @@ class DocumentSheetRegistrar {
 
 
 	/**
-	 * Creates a new sheetClasses config object for this document type.
+	 * Creates a new sheetClasses config object for this kind of document.
 	 *
-	 * @param {DocumentMap} doc - The type of document to add a config object for
+	 * @param {DocumentMap} doc - The kind of document to add a config object for
 	 * @memberof DocumentSheetRegistrar
 	 */
 	static configureSheetClasses(doc) {
+		CONFIG[doc.name].sheetClasses = { };
+
+		if (doc.class.metadata.types.length) {
+			for (let type of doc.class.metadata.types) {
+				this.configureSheetClassessByType(doc, type);
+			}
+		}
+
+		// "base" for documents that only have one type
 		this.configureSheetClassessByType(doc, "base");
+	}
+
+
+
 	/**
 	 * Creates a new sheetClasses config object for this document and type.
 	 *
