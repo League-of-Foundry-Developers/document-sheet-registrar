@@ -252,6 +252,14 @@ export default class DocumentSheetRegistrar {
 		* });
 		*/
 		doc.collection.registerSheet = function (...args) {
+			const options = args[2];
+
+			for (let type of options.types) {
+				if (!Object.keys(CONFIG[doc.name].sheetClasses).some(key => key == type)) {
+					CONFIG[doc.name].sheetClasses[type] = {};
+				}
+			}
+
 			EntitySheetConfig.registerSheet(doc.class, ...args);
 		}
 
