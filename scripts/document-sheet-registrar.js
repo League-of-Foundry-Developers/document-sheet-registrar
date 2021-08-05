@@ -155,9 +155,13 @@ class DocumentSheetRegistrar {
 	 * @memberof DocumentSheetRegistrar
 	 */
 	static redirectSheetClass(doc) {
-		Object.defineProperty(CONFIG[doc.name], 'sheetClass', {
-			get: () => CONFIG[doc.name].sheetClasses['base'][doc.name].cls,
-			set: (value) => { CONFIG[doc.name].sheetClasses['base'][doc.name].cls = value },
+		Object.defineProperty(CONFIG[doc.name], "sheetClass", {
+			get: function() { 
+				return CONFIG[doc.name].sheetClasses["base"][doc.name].cls 
+			},
+			set: function (value) { 
+				CONFIG[doc.name].sheetClasses["base"][doc.name].cls = value 
+			},
 			configurable: false
 		});
 	}
