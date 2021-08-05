@@ -105,11 +105,8 @@ class DocumentSheetRegistrar {
 	 * @memberof DocumentSheetRegistrar
 	 */
 	static initializeDocumentSheet(doc) {
-		// Skip Folder because it has types already and doesn't seem that useful
-		if (doc.name == "Folder") return;
-
-		// Set the base type for this document class
-		doc.class.prototype.type = "base";
+		// Set up the type property for this document
+		this.setupTypes(doc);
 
 		// Override the sheet retrieval method for this document type
 		libWrapper.register("_document-sheet-registrar", `${doc.name}.prototype._getSheetClass`, this._getSheetClass, "OVERRIDE");
@@ -122,6 +119,38 @@ class DocumentSheetRegistrar {
 
 		// Redirect sheetClass
 		this.redirectSheetClass(doc);
+	}
+
+	
+	/**
+	 * Ensures that the document has a type property, either a static 
+	 * "base" or a getter that returns the type.
+	 *
+	 * @static
+	 * @param {DocumentMap} doc - The type of document to add a type property to
+	 * @return {*} 
+	 * @memberof DocumentSheetRegistrar
+	 */
+	static setupTypes(doc) {
+		// If there are not multiple types
+		if (!doc.class.metadata.types.length)  { 
+			// Set the "base" type for this document class
+			doc.class.prototype.type = "base"; 
+
+			// And do nothing else
+			return;
+		}
+
+		// If there is already a type property, do nothing
+		if (Object.getOwnPropertyDescriptor(doc.class.prototype, "type")) return;
+		
+		// Otherwise create a getter for the type property
+		Object.defineProperty(doc.class.prototype, "type", {
+			get: function() {
+				// The type stored in the document data
+				return this.data.type;
+			}
+		});
 	}
 
 
