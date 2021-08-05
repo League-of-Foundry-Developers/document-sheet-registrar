@@ -2,7 +2,7 @@
 	"name": "_document-sheet-registrar",
 	"title": "Lib: Document Sheet Registrar",
 	"description": "A library module which enables the registration of alternative document sheets for all document types that don't normally have this capacity.",
-	"version": "0.3.0",
+	"version": "0.4.0",
 	"library": true,
 	"manifestPlusVersion": "1.1.0",
 	"minimumCoreVersion": "0.8.8",
@@ -24,5 +24,5 @@
 	],
 	"url": "https://github.com/League-of-Foundry-Developers/document-sheet-registrar",
 	"manifest": "https://github.com/League-of-Foundry-Developers/document-sheet-registrar/releases/latest/download/module.json",
-	"download": "https://github.com/League-of-Foundry-Developers/document-sheet-registrar/releases/latest/download/document-sheet-registrar.zip"
+	"download": "https://github.com/League-of-Foundry-Developers/document-sheet-registrar/releases/latest/download/_document-sheet-registrar.zip"
 }

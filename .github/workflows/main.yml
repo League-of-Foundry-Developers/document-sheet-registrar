@@ -1,6 +1,6 @@
 name: Release Creation
 
-on: 
+on:
   release:
     types: [published]
 
@@ -28,7 +28,7 @@ jobs:
         download: https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/_document-sheet-registrar.zip
 
     # Create a zip file with all files required by the module to add to the release
-    - run: zip -r ./module.zip module.json LICENSE scripts/
+    - run: zip -r ./_document-sheet-registrar.zip module.json LICENSE scripts/
 
     # Create a release for this specific version
     - name: Update Release with Files
@@ -37,7 +37,8 @@ jobs:
       with:
         allowUpdates: true # Set this to false if you want to prevent updating existing releases
         name: ${{ github.event.release.name }}
-        draft: false
+        draft: ${{ github.event.release.unpublished }}
+        prerelease: ${{ github.event.release.prerelease }}
         token: ${{ secrets.GITHUB_TOKEN }}
         artifacts: './module.json, ./_document-sheet-registrar.zip'
         tag: ${{ github.event.release.tag_name }}
