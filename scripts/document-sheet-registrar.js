@@ -69,8 +69,6 @@ export default class DocumentSheetRegistrar {
 	 * @memberof DocumentSheetRegistrar
 	 */
 	static getDocumentSheetHeaderButtons(sheet, buttons) {
-		console.log(sheet);
-
 		// If the document name isn't in the set of documentTypes, do nothing
 		if (!this.documentTypes.some(doc => doc.name == sheet.object.documentName)) return;
 
@@ -103,6 +101,12 @@ export default class DocumentSheetRegistrar {
 
 		// Add a sheet config event handler for header buttons on DocumentSheet
 		DocumentSheet.prototype._onConfigureSheet = this._onConfigureSheet;
+
+		libWrapper.register("_document-sheet-registrar", "EntitySheetConfig.updateDefaultSheets", DocumentSheetRegistrar.updateDefaultSheets, "OVERRIDE");
+		libWrapper.register("_document-sheet-registrar", "EntitySheetConfig.prototype.getData", function (wrapped, ...args) {
+			this.object.data.type = this.object.type;
+			return wrapped(...args);
+		}, "WRAPPER");
 	}
 
 
@@ -129,11 +133,6 @@ export default class DocumentSheetRegistrar {
 
 		// Redirect sheetClass
 		this.redirectSheetClass(doc);
-
-		libWrapper.register("_document-sheet-registrar", "EntitySheetConfig.prototype.getData", function(wrapped, ...args) {
-			this.object.data.type = this.object.type;
-			return wrapped(...args);	
-		}, "WRAPPER");
 	}
 
 	
@@ -356,7 +355,7 @@ Hooks.once("init", DocumentSheetRegistrar.initializeDocumentSheets.bind(Document
 Hooks.on("getDocumentSheetHeaderButtons", DocumentSheetRegistrar.getDocumentSheetHeaderButtons.bind(DocumentSheetRegistrar));
 
 Hooks.on("setup", () => {
-	libWrapper.register("_document-sheet-registrar", "EntitySheetConfig.updateDefaultSheets", DocumentSheetRegistrar.updateDefaultSheets, "OVERRIDE");
+	
 });
 
 
