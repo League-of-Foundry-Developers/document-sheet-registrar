@@ -327,7 +327,10 @@ export default class DocumentSheetRegistrar {
 	 */
 	static updateDefaultSheets(setting = {}) {
 		if (!Object.keys(setting).length) return;
-		const documents = DocumentSheetRegistrar.documentTypes.map(doc => doc.name);
+		const documents = [
+			"Actor", "Item", 
+			...DocumentSheetRegistrar.documentTypes.map(doc => doc.name)
+		];
 		for (let documentName of documents) {
 			const cfg = CONFIG[documentName];
 			const classes = cfg.sheetClasses;
