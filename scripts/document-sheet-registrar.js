@@ -149,23 +149,10 @@ export default class DocumentSheetRegistrar {
 	 * @memberof DocumentSheetRegistrar
 	 */
 	static setupTypes(doc) {
-		/*/ If there are not multiple types
-		if (!doc.class.metadata.types.length)  { 
-			// Set the "base" type for this document class
-			doc.class.prototype.type = CONST.BASE_ENTITY_TYPE;
-
-			// And do nothing else
-			return;
-		}*/
-
-		// If there is already a type property, do nothing
-		// if (Object.getOwnPropertyDescriptor(doc.class.prototype, "type")) return;
-		
-		// Otherwise create a getter for the type property
 		Object.defineProperty(doc.class.prototype, "type", {
 			get: function() {
 				// The type stored in the document data
-				return this.data?.type || this.data?.flags?.[DocumentSheetRegistrar.name]?.type || CONST.BASE_ENTITY_TYPE;
+				return  this.data?.flags?.[DocumentSheetRegistrar.name]?.type || this.data?.type || CONST.BASE_ENTITY_TYPE;
 			}
 		});
 	}
