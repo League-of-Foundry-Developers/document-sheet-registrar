@@ -248,7 +248,9 @@ export default class DocumentSheetRegistrar {
 		doc.collection.registerSheet = function (...args) {
 			const options = args[2];
 
-			for (let type of options.types) {
+			const types = options?.types || doc.class?.metadata?.types || [CONST.BASE_ENTITY_TYPE];
+
+			for (let type of types) {
 				if (!Object.keys(CONFIG[doc.name].sheetClasses).some(key => key == type)) {
 					CONFIG[doc.name].sheetClasses[type] = {};
 				}
