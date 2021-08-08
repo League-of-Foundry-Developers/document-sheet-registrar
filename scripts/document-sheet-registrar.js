@@ -72,6 +72,9 @@ export default class DocumentSheetRegistrar {
 		// If the document name isn't in the set of documentTypes, do nothing
 		if (!this.documentTypes.some(doc => doc.name == sheet.object.documentName)) return;
 
+		// If the document doesn't have multiple registered sheets for this type, do nothing
+		if (Object.entries(CONFIG[sheet.object.documentName]?.sheetClasses?.[sheet.object.type]).length < 2) return;
+
 		// If there is already a Sheet button, do nothing
 		if (buttons.includes(button => button.label == "Sheet")) return;
 
