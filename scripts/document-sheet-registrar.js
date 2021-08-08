@@ -20,7 +20,17 @@ import { libWrapper } from './libWrapperShim.js'
  * });
  *
  */
-class DocumentSheetRegistrar {
+export default class DocumentSheetRegistrar {
+	/**
+	 * The name of the Document Sheet Registrar module module
+	 *
+	 * @type {string} 
+	 * @readonly
+	 * @static
+	 * @memberof DocumentSheetRegistrar
+	 */
+	static get name() { return "_document-sheet-registrar"; }
+
 	/**
 	 * @typedef {object} DocumentMap A map of document name, class, and collection
 	 * @property {string}              name       - The name of the document
@@ -59,8 +69,6 @@ class DocumentSheetRegistrar {
 	 * @memberof DocumentSheetRegistrar
 	 */
 	static getDocumentSheetHeaderButtons(sheet, buttons) {
-		console.log(sheet);
-
 		// If the document name isn't in the set of documentTypes, do nothing
 		if (!this.documentTypes.some(doc => doc.name == sheet.object.documentName)) return;
 
@@ -93,6 +101,15 @@ class DocumentSheetRegistrar {
 
 		// Add a sheet config event handler for header buttons on DocumentSheet
 		DocumentSheet.prototype._onConfigureSheet = this._onConfigureSheet;
+
+		// Add wrapper to update the default sheet config when settings are changed
+		libWrapper.register("_document-sheet-registrar", "EntitySheetConfig.updateDefaultSheets", DocumentSheetRegistrar.updateDefaultSheets, "OVERRIDE");
+
+		// Add wrapper to ensure that the object.data.type is always set as exptcted
+		libWrapper.register("_document-sheet-registrar", "EntitySheetConfig.prototype.getData", function (wrapped, ...args) {
+			this.object.data.type = this.object.type;
+			return wrapped(...args);
+		}, "WRAPPER");
 	}
 
 
@@ -132,23 +149,10 @@ class DocumentSheetRegistrar {
 	 * @memberof DocumentSheetRegistrar
 	 */
 	static setupTypes(doc) {
-		// If there are not multiple types
-		if (!doc.class.metadata.types.length)  { 
-			// Set the "base" type for this document class
-			doc.class.prototype.type = "base"; 
-
-			// And do nothing else
-			return;
-		}
-
-		// If there is already a type property, do nothing
-		if (Object.getOwnPropertyDescriptor(doc.class.prototype, "type")) return;
-		
-		// Otherwise create a getter for the type property
 		Object.defineProperty(doc.class.prototype, "type", {
 			get: function() {
 				// The type stored in the document data
-				return this.data.type;
+				return  this.data?.flags?.[DocumentSheetRegistrar.name]?.type || this.data?.type || CONST.BASE_ENTITY_TYPE;
 			}
 		});
 	}
@@ -170,7 +174,7 @@ class DocumentSheetRegistrar {
 		}
 
 		// "base" for documents that only have one type
-		this.configureSheetClassessByType(doc, "base");
+		this.configureSheetClassessByType(doc, CONST.BASE_ENTITY_TYPE);
 	}
 
 
@@ -207,10 +211,10 @@ class DocumentSheetRegistrar {
 	static redirectSheetClass(doc) {
 		Object.defineProperty(CONFIG[doc.name], "sheetClass", {
 			get: function() { 
-				return CONFIG[doc.name].sheetClasses["base"][doc.name].cls 
+				return CONFIG[doc.name].sheetClasses[CONST.BASE_ENTITY_TYPE][doc.name].cls
 			},
 			set: function (value) { 
-				CONFIG[doc.name].sheetClasses["base"][doc.name].cls = value 
+				CONFIG[doc.name].sheetClasses[CONST.BASE_ENTITY_TYPE][doc.name].cls = value
 			},
 			configurable: false
 		});
@@ -242,6 +246,16 @@ class DocumentSheetRegistrar {
 		* });
 		*/
 		doc.collection.registerSheet = function (...args) {
+			const options = args[2];
+
+			const types = options?.types || doc.class?.metadata?.types || [CONST.BASE_ENTITY_TYPE];
+
+			for (let type of types) {
+				if (!Object.keys(CONFIG[doc.name].sheetClasses).some(key => key == type)) {
+					CONFIG[doc.name].sheetClasses[type] = {};
+				}
+			}
+
 			EntitySheetConfig.registerSheet(doc.class, ...args);
 		}
 
@@ -294,6 +308,38 @@ class DocumentSheetRegistrar {
 			top: this.position.top + 40,
 			left: this.position.left + ((this.position.width - 400) / 2)
 		}).render(true);
+	}
+
+	/**
+	 * Update the currently default Sheets using a new core world setting
+	 * @param {object} setting
+	 */
+	static updateDefaultSheets(setting = {}) {
+		if (!Object.keys(setting).length) return;
+		const documents = [
+			"Actor", "Item", 
+			...DocumentSheetRegistrar.documentTypes.map(doc => doc.name)
+		];
+		for (let documentName of documents) {
+			const cfg = CONFIG[documentName];
+			const classes = cfg.sheetClasses;
+			const collection = cfg.collection.instance;
+			let defaults = setting[documentName] || {};
+			if (!defaults) continue;
+
+			// Update default preference for registered sheets
+			for (let [type, sheetId] of Object.entries(defaults)) {
+				const sheets = Object.values(classes[type] || {});
+				let requested = sheets.find(s => s.id === sheetId);
+				if (requested) sheets.forEach(s => s.default = s.id === sheetId);
+			}
+
+			// Close and de-register any existing sheets
+			for (let document of collection) {
+				Object.values(document.apps).forEach(app => app.close());
+				document.apps = {};
+			}
+		}
 	}
 }
 
