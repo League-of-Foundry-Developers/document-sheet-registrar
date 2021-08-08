@@ -42,7 +42,7 @@ export default class DocumentSheetRegistrar {
 	 */
 	static get documentTypes() {
 		return Object.entries(CONFIG)
-			.filter(([key, config]) => config.sheetClass && config.collection)
+			.filter(([key, config]) => config.sheetClass || config.sheetClasses && config.collection)
 			.map(([key, config]) => {
 				/** @return {DocumentMap} */
 				return {
@@ -170,6 +170,9 @@ export default class DocumentSheetRegistrar {
 	 * @memberof DocumentSheetRegistrar
 	 */
 	static configureSheetClasses(doc) {
+		// If this object already exists, do nothing
+		if (CONFIG[doc.name]?.sheetClasses) return;
+
 		CONFIG[doc.name].sheetClasses = { };
 
 		if (doc.class.metadata.types.length) {
@@ -326,10 +329,7 @@ export default class DocumentSheetRegistrar {
 	 */
 	static updateDefaultSheets(setting = {}) {
 		if (!Object.keys(setting).length) return;
-		const documents = [
-			"Actor", "Item", 
-			...DocumentSheetRegistrar.documentTypes.map(doc => doc.name)
-		];
+		const documents = DocumentSheetRegistrar.documentTypes.map(doc => doc.name);
 		for (let documentName of documents) {
 			const cfg = CONFIG[documentName];
 			const classes = cfg.sheetClasses;
