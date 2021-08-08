@@ -31,6 +31,12 @@ export default class DocumentSheetRegistrar {
 	 */
 	static get name() { return "_document-sheet-registrar"; }
 
+	static settings = Object.fromEntries(
+		Object.entries(CONFIG)
+			.filter(([key, config]) => (config.sheetClass || config.sheetClasses) && config.collection)
+			.map(([key, config]) => [key, false])
+	);
+
 	/**
 	 * @typedef {object} DocumentMap A map of document name, class, and collection
 	 * @property {string}              name       - The name of the document
@@ -48,7 +54,8 @@ export default class DocumentSheetRegistrar {
 				return {
 					name: key,
 					class: config.documentClass,
-					collection: config.collection
+					collection: config.collection,
+					enabled: this.settings[key]
 				}
 			});
 	}
@@ -98,10 +105,7 @@ export default class DocumentSheetRegistrar {
 		console.log(game.i18n.localize("_document-sheet-registrar.console.log.init"));
 
 		for (let doc of this.documentTypes) {
-			// Skip any collection that already has a sheet registration method
-			if (doc.collection.registerSheet) continue;
-
-			this.initializeDocumentSheet(doc);
+			if (doc.enabled) this.initializeDocumentSheet(doc);
 		}
 
 		// Add a sheet config event handler for header buttons on DocumentSheet
@@ -170,10 +174,8 @@ export default class DocumentSheetRegistrar {
 	 * @memberof DocumentSheetRegistrar
 	 */
 	static configureSheetClasses(doc) {
-		// If this object already exists, do nothing
-		if (CONFIG[doc.name]?.sheetClasses) return;
-
-		CONFIG[doc.name].sheetClasses = { };
+		if (!CONFIG[doc.name]?.sheetClasses)
+			CONFIG[doc.name].sheetClasses = { };
 
 		if (doc.class.metadata.types.length) {
 			for (let type of doc.class.metadata.types) {
@@ -196,6 +198,9 @@ export default class DocumentSheetRegistrar {
 	 * @memberof DocumentSheetRegistrar
 	 */
 	static configureSheetClassessByType(doc, type) {
+		// If this config already exists, do nothing
+		if (CONFIG[doc.name].sheetClasses[type]) return;
+		
 		CONFIG[doc.name].sheetClasses[type] = {                                
 			[doc.name]: {                        // Register the default sheet
 				id: doc.name,
@@ -329,7 +334,7 @@ export default class DocumentSheetRegistrar {
 	 */
 	static updateDefaultSheets(setting = {}) {
 		if (!Object.keys(setting).length) return;
-		const documents = DocumentSheetRegistrar.documentTypes.map(doc => doc.name);
+		const documents = DocumentSheetRegistrar.documentTypes.filter(doc => doc.enabled).map(doc => doc.name);
 		for (let documentName of documents) {
 			const cfg = CONFIG[documentName];
 			const classes = cfg.sheetClasses;
@@ -352,6 +357,9 @@ export default class DocumentSheetRegistrar {
 		}
 	}
 }
+
+// Call settings hook for this module
+Hooks.callAll("preDocumentSheetRegistrarInit", DocumentSheetRegistrar.settings);
 
 // On init, create the nessesary configs and methods to enable the sheet config API
 Hooks.once("init", DocumentSheetRegistrar.initializeDocumentSheets.bind(DocumentSheetRegistrar));
