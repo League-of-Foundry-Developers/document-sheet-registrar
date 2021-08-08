@@ -28,7 +28,7 @@ jobs:
         download: https://github.com/${{github.repository}}/releases/download/${{github.event.release.tag_name}}/_document-sheet-registrar.zip
 
     # Create a zip file with all files required by the module to add to the release
-    - run: zip -r ./_document-sheet-registrar.zip module.json LICENSE scripts/
+    - run: zip -r ./_document-sheet-registrar.zip module.json LICENSE scripts/ lang/
 
     # Create a release for this specific version
     - name: Update Release with Files

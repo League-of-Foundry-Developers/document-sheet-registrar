@@ -95,6 +95,8 @@ export default class DocumentSheetRegistrar {
 	 * @memberof DocumentSheetRegistrar
 	 */
 	static initializeDocumentSheets() {
+		console.log(game.i18n.localize("_document-sheet-registrar.console.log.init"));
+
 		for (let doc of this.documentTypes) {
 			// Skip any collection that already has a sheet registration method
 			if (doc.collection.registerSheet) continue;
@@ -297,7 +299,12 @@ export default class DocumentSheetRegistrar {
 		const override = this.getFlag("core", "sheetClass");
 		if (sheets[override]) return sheets[override].cls;
 		const classes = Object.values(sheets);
-		if (!classes.length) return null;
+		if (!classes.length) {
+			ui.notifications.warn(
+				game.i18n.format("_document-sheet-registrar.ui.warn.no-sheet-found", { sheet: override })
+			);
+			return null;
+		}
 		return (classes.find(s => s.default) ?? classes.pop()).cls;
 	}
 

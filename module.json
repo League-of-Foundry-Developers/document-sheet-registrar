@@ -7,6 +7,13 @@
 	"manifestPlusVersion": "1.1.0",
 	"minimumCoreVersion": "0.8.8",
 	"compatibleCoreVersion": "0.8.8",
+	"languages": [
+		{
+			"lang": "en",
+			"name": "English",
+			"path": "lang/en.json"
+		}
+	],
 	"authors": [
 		{
 			"name": "zeel",

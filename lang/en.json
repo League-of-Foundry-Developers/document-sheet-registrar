@@ -1,0 +1,15 @@
+{
+	"_document-sheet-registrar": {
+		"title": "Lib: Document Sheet Registrar",
+		"ui": {
+			"warn": {
+				"no-sheet-found": "There is not a sheet `{sheet}` registered to display this document. You may need to enable an associated module."
+			}
+		},
+		"console": {
+			"log": {
+				"init": "Document Sheet Registrar: Initialized"
+			}
+		}
+	}
+}
