@@ -42,7 +42,7 @@ export default class DocumentSheetRegistrar {
 	 */
 	static get documentTypes() {
 		return Object.entries(CONFIG)
-			.filter(([key, config]) => config.sheetClass || config.sheetClasses && config.collection)
+			.filter(([key, config]) => (config.sheetClass || config.sheetClasses) && config.collection)
 			.map(([key, config]) => {
 				/** @return {DocumentMap} */
 				return {
