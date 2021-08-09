@@ -1,7 +1,7 @@
 # Lib: Document Sheet Registrar
 
 ![_document-sheet-registrar](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2FLeague-of-Foundry-Developers%2Fleague-repo-status%2Fshields-endpoint%2F_document-sheet-registrar.json)
-![Latest Release Download Count](https://img.shields.io/github/downloads/League-of-Foundry-Developers/document-sheet-registrar/latest/module.zip) 
+![Latest Release Download Count](https://img.shields.io/github/downloads/League-of-Foundry-Developers/document-sheet-registrar/latest/_document-sheet-registrar.zip) 
 
 ## Why does this exist?
 
