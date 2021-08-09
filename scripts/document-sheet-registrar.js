@@ -312,7 +312,7 @@ export default class DocumentSheetRegistrar {
 		* @param {Application} sheetClass             A defined Application class used to render the sheet
 		* @param {Object}      options                Additional options used for sheet registration
 		* @param {string}     [options.label]         A human readable label for the sheet name, which will be localized
-		* @param {string[]}   [options.types]         An array of entity types for which this sheet should be used. When not specified, all types will be used. That does *not* include artificial tpye, if you are using artificial types you must specify them here.
+		* @param {string[]}   [options.types]         An array of entity types for which this sheet should be used. When not specified, all types will be used. That does *not* include artificial types, if you are using artificial types you must specify them here.
 		* @param {boolean}    [options.makeDefault]   Whether to make this sheet the default for provided types
 		*
 		* @example

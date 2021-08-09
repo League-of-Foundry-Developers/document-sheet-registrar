@@ -58,7 +58,7 @@ You must enable your chosen document type in the `preDocumentSheetRegistrarInit`
 | sheetClass | `Application`  | A defined Application class used to render the sheet | &nbsp; |
 | options | `Object`  | Additional options used for sheet registration | &nbsp; |
 | options.label | `string`  | A human readable label for the sheet name, which will be localized | *Optional* |
-| options.types | `Array.<string>`  | An array of entity types for which this sheet should be used.  When not specified, all types will be used. That does *not* include artificial tpye, if you are using artificial types you must specify them here. | *Optional* |
+| options.types | `Array.<string>`  | An array of entity types for which this sheet should be used.  When not specified, all types will be used. That does *not* include artificial types, if you are using artificial types you must specify them here. | *Optional* |
 | options.makeDefault | `boolean`  | Whether to make this sheet the default for provided types | *Optional* |
 
 #### Examples
