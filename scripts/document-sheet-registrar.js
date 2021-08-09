@@ -163,10 +163,12 @@ export default class DocumentSheetRegistrar {
 			return wrapped(...args);
 		}, "WRAPPER");
 
-		// Call the init hook to alert modules that the registrar is ready
-		Hooks.callAll("documentSheetRegistrarInit", this.documentTypes);
-
 		console.log(game.i18n.localize("Document Sheet Registrar: ...ready!"));
+
+		// Call the init hook to alert modules that the registrar is ready
+		Hooks.callAll("documentSheetRegistrarInit", Object.fromEntries(
+			this.documentTypes.filter(doc => doc.enabled).map(doc => [doc.name, doc])
+		));
 	}
 
 
