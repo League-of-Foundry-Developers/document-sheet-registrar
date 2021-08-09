@@ -30,11 +30,25 @@ Once this library is active (it should be activated at the start of the `init` h
 - Playlist
 - Scene
 - User
-- ~~Folder~~ (excluded for complexity)
+- Folder
+
+### Hooks
+
+This library provides two hooks:
+```js
+Hooks.on("preDocumentSheetRegistrarInit", (settings) => {});
+Hooks.on("documentSheetRegistrarInit", (documentTypes) => {});
+```
+
+The `preDocumentSheetRegistrarInit` hook passes an object of boolean "settings", you must set the setting coresponding to the document type that you wish to register a sheet for to `true`. If you do not do this, the registration method will not be created which will produce an error when you call it.
+
+The `documentSheetRegistrarInit` hook indicates that the initialization process has been completed, and it is now safe to register your sheets. This hook also passes an object of data about any documents for which this library has been enabled. 
 
 ### `DocType.registerSheet`
 
-Register a sheet class as a candidate which can be used to display Journal Entries.
+Register a sheet class as a candidate which can be used to display this document. 
+
+You must enable your chosen document type in the `preDocumentSheetRegistrarInit` hook for this method to be available.
 
 #### Parameters
 
@@ -58,7 +72,10 @@ Journal.registerSheet?.("myModule", SheetApplicationClass, {
 ```
 
 ### `DocType.unregisterSheet`
+
 Unregister a Journal Entry sheet class, removing it from the list of available Applications to use for Journal Entries.
+
+You must enable your chosen document type in the `preDocumentSheetRegistrarInit` hook for this method to be available.
 
 #### Parameters
 
@@ -86,3 +103,44 @@ It can be set in [any of the ways a flag can be set](https://foundryvtt.wiki/en/
 ```js
 someJournalEntry.setFlag('core', 'sheetClass', 'my-module.MyModuleSheetClassName');
 ```
+### Types
+
+This library introduces the ability to give documents "types" even for documents that did not support types before. The `object.type` property is supported on many documents in Core such as Actor (character, npc, vehicle), Item, Macro (script, chat), and others. This allows a document to have type-specific sheets such as NPC sheets vs. character sheets. With Document Sheet Registrar, we can add "artificial" types to any of the following nine do documents:
+
+- Actor
+- Item
+- JournalEntry
+- RollTable
+- Macro
+- Playlist
+- Scene
+- User
+- Folder
+
+There are two steps to adding a new artificial type. First, you must register a new sheet and pass your custom type as part of the `types` array:
+
+```javascript
+DocType.registerSheet?.("myModule", SheetApplicationClass, {
+  types: ["my-type"],
+  makeDefault: false,
+  label: "My document sheet"
+});
+```
+
+When you register a sheet in this way, the sheet will only be avaialble to documents with the specified type. Since the `object.data.type` property is part of the official schema of the document, we can not add this property to docuemnts that don't already support it, or give it a custom value. Instead, DSR uses a `type ` flag in the `_document-sheet-registrar` scope to specifiy the artificial type.
+
+```js
+document.setFlag("_document-sheet-registrar", "type", "my-type")
+```
+
+This will cause the `object.type` getter on the document to return the value stored in this flag, resulting in a different selection of sheets which are specific to that `type`.
+
+Note that if no sheet is registered to handle a given document and type, an error will occur. When this happens with the library enabled, a UI wanring is displayed. When the library is disabled, the default sheet for that document will render.
+
+## The Sheet Config Dialog
+
+In order to give the user control of how their documents are rendered, documents that have multiple registered sheets will now have a "⚙ sheet" button in the header of their sheet application. This button opens the same sheet dialog that is used by Actor and Item.
+
+If for some reason you need to prevent users from modifying this, you can hide the button with CSS by targetting the `.configure-sheet` class on the element.
+
+If it is important that documents created for your module only be rendered using sheets provided by your module, you may also want to restrict which sheets are avaialble by setting a particular `type` for those sheets. You can specify an existing type for documents that support it, e.g. "script" Macros, or you can use the artificial types system discussed in the API section above. The sheet config dialog will only give the user the option to select a sheet that is valid for the type of the document being configured.
