@@ -44,6 +44,36 @@ The `preDocumentSheetRegistrarInit` hook passes an object of boolean "settings",
 
 The `documentSheetRegistrarInit` hook indicates that the initialization process has been completed, and it is now safe to register your sheets. This hook also passes an object of data about any documents for which this library has been enabled. 
 
+### Settings
+
+From the `preDocumentSheetRegistrarInit` hook you can choose to enable this library for particular document types. The hook passes a `settings` parameter which is an object like so:
+
+```js
+{
+  Actor: false
+  Folder: false
+  Item: false
+  JournalEntry: false
+  Macro: false
+  Playlist: false
+  RollTable: false
+  Scene: false
+  User: false
+}
+```
+
+You need only to set the appropriate value to `true` for the document type you wish to register a sheet for.
+
+Example:
+
+```js
+Hooks.on("preDocumentSheetRegistrarInit", (settings) => {
+  settings["JournalEntry"] = true;
+});
+```
+
+This will enable `Journal.registerSheet`.
+
 ### `DocType.registerSheet`
 
 Register a sheet class as a candidate which can be used to display this document. 
