@@ -96,17 +96,28 @@ export default class DocumentSheetRegistrar {
 
 
 	/**
-	 * Initialize all of the document sheet registrars.
+	 * Handles the init hook
+	 *
+	 * Initializes all of the document sheet registrars,
+	 * then sets up some wrapper functions.
+	 * 
+	 * Calls a pre-init hook to allow modules to request certain 
+	 * sheet registration options.
+	 *
+	 * Finally calls a post-init hook to alert modules that the
+	 * document sheet registrar has been initialized.
 	 *
 	 * @static
 	 * @memberof DocumentSheetRegistrar
 	 */
-	static initializeDocumentSheets() {
-		console.log(game.i18n.localize("_document-sheet-registrar.console.log.init"));
+	static init() {
+		console.log(game.i18n.localize("Document Sheet Registrar: initializing..."));
 
-		for (let doc of this.documentTypes) {
-			if (doc.enabled) this.initializeDocumentSheet(doc);
-		}
+		// Call settings hook for this module
+		Hooks.callAll("preDocumentSheetRegistrarInit", this.settings);
+
+		// Initialize all of the document sheet registrars
+		this.initializeDocumentSheets();
 
 		// Add a sheet config event handler for header buttons on DocumentSheet
 		DocumentSheet.prototype._onConfigureSheet = this._onConfigureSheet;
@@ -119,6 +130,25 @@ export default class DocumentSheetRegistrar {
 			this.object.data.type = this.object.type;
 			return wrapped(...args);
 		}, "WRAPPER");
+
+		// Call the init hook to alert modules that the registrar is ready
+		Hooks.callAll("documentSheetRegistrarInit", this.documentTypes);
+
+		console.log(game.i18n.localize("Document Sheet Registrar: ...ready!"));
+	}
+
+
+	/**
+	 * Initialize all of the document sheet registrars.
+	 *
+	 * @static
+	 * @memberof DocumentSheetRegistrar
+	 */
+	static initializeDocumentSheets() {
+		for (let doc of this.documentTypes) {
+			// Skip documents that aren't enabled
+			if (doc.enabled) this.initializeDocumentSheet(doc);
+		}
 	}
 
 
@@ -358,11 +388,9 @@ export default class DocumentSheetRegistrar {
 	}
 }
 
-// Call settings hook for this module
-Hooks.callAll("preDocumentSheetRegistrarInit", DocumentSheetRegistrar.settings);
 
 // On init, create the nessesary configs and methods to enable the sheet config API
-Hooks.once("init", DocumentSheetRegistrar.initializeDocumentSheets.bind(DocumentSheetRegistrar));
+Hooks.once("init", DocumentSheetRegistrar.init.bind(DocumentSheetRegistrar));
 
 // When a doc sheet is rendered, add a header button for sheet configuration
 Hooks.on("getDocumentSheetHeaderButtons", DocumentSheetRegistrar.getDocumentSheetHeaderButtons.bind(DocumentSheetRegistrar));
