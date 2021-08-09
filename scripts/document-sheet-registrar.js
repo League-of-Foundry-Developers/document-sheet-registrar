@@ -53,6 +53,16 @@ export default class DocumentSheetRegistrar {
 		) && config.collection;
 	}
 
+	
+	/**
+	 * A list of booleans for each document type that indicates whether
+	 * or not the sheet registration is enabled.
+	 *
+	 * @type {object<string, boolean>}
+	 *
+	 * @static
+	 * @memberof DocumentSheetRegistrar
+	 */
 	static settings = Object.fromEntries(
 		Object.entries(CONFIG)
 			.filter(this.filterDocs)
