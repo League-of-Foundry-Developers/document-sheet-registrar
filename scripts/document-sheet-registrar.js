@@ -31,9 +31,31 @@ export default class DocumentSheetRegistrar {
 	 */
 	static get name() { return "_document-sheet-registrar"; }
 
+
+	/**
+	 * A function to filter the CONFIG...Document object for only 
+	 * documents that have either the sheetClass or sheetClasses property
+	 * and have a collection.
+	 *
+	 * Since these properties can be getters, it can be dangerous to run the
+	 * getters this early in the init process. Instead, we use 
+	 * Object.getOwnPropertyDescriptors to check if the properties exist.
+	 *
+	 * @static
+	 * @param {[string, object]} [key, config] - The key and config object for the document type
+	 * @return {boolean}                         True if the document fits the criteria, false otherwise
+	 * @memberof DocumentSheetRegistrar
+	 */
+	static filterDocs([key, config]) {
+		return (   
+			Object.getOwnPropertyDescriptor(config, "sheetClass") || 
+			Object.getOwnPropertyDescriptor(config, "sheetClasses") 
+		) && config.collection;
+	}
+
 	static settings = Object.fromEntries(
 		Object.entries(CONFIG)
-			.filter(([key, config]) => (config.sheetClass || config.sheetClasses) && config.collection)
+			.filter(this.filterDocs)
 			.map(([key, config]) => [key, false])
 	);
 
@@ -48,7 +70,7 @@ export default class DocumentSheetRegistrar {
 	 */
 	static get documentTypes() {
 		return Object.entries(CONFIG)
-			.filter(([key, config]) => (config.sheetClass || config.sheetClasses) && config.collection)
+			.filter(this.filterDocs)
 			.map(([key, config]) => {
 				/** @return {DocumentMap} */
 				return {
@@ -230,7 +252,7 @@ export default class DocumentSheetRegistrar {
 	static configureSheetClassessByType(doc, type) {
 		// If this config already exists, do nothing
 		if (CONFIG[doc.name].sheetClasses[type]) return;
-		
+
 		CONFIG[doc.name].sheetClasses[type] = {                                
 			[doc.name]: {                        // Register the default sheet
 				id: doc.name,
