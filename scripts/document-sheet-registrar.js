@@ -355,8 +355,18 @@ export default class DocumentSheetRegistrar {
 	}
 
 
-	/*********************************************************************************************/
-
+	/*********************************************************************************************
+	 * This section contains code copied from the Foundry core software and modified for
+	 * this library.
+	 *
+	 * Foundry Virtual Tabletop © Copyright 2021, Foundry Gaming, LLC.
+	 * 
+	 * This code is used in accordance with the Foundry Virtual Tabletop 
+	 * LIMITED LICENSE AGREEMENT FOR MODULE DEVELOPMENT.
+	 *
+	 * https://foundryvtt.com/article/license/
+	 *
+	 *********************************************************************************************/
 
 	/**
 	 * Retrieve the sheet class for the document. @see Actor._getSheetClass
@@ -420,6 +430,12 @@ export default class DocumentSheetRegistrar {
 			}
 		}
 	}
+
+	/*********************************************************************************************
+	 * 
+	 * END OF SECTION COPIED FROM FOUNDRY CORE SOFTWARE
+	 *
+	 *********************************************************************************************/
 }
 
 
