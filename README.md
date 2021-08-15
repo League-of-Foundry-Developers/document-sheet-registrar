@@ -165,7 +165,7 @@ document.setFlag("_document-sheet-registrar", "type", "my-type")
 
 This will cause the `object.type` getter on the document to return the value stored in this flag, resulting in a different selection of sheets which are specific to that `type`.
 
-Note that if no sheet is registered to handle a given document and type, an error will occur. When this happens with the library enabled, a UI wanring is displayed. When the library is disabled, the default sheet for that document will render.
+Note that if no sheet is registered to handle a given document and type, an error will occur. When this happens with the library enabled, a UI warning is displayed. When the library is disabled, the default sheet for that document will render.
 
 ## The Sheet Config Dialog
 
