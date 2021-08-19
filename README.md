@@ -120,7 +120,7 @@ You must enable your chosen document type in the `preDocumentSheetRegistrarInit`
 
 ```javascript
 Journal.unregisterSheet?.("myModule", SheetApplicationClass, {
-	types: ["base"],
+  types: ["base"],
 });
 ```
 
