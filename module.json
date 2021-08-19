@@ -2,11 +2,11 @@
 	"name": "_document-sheet-registrar",
 	"title": "Lib: Document Sheet Registrar",
 	"description": "A library module which enables the registration of alternative document sheets for all document types that don't normally have this capacity.",
-	"version": "0.5.0",
+	"version": "0.6.1",
 	"library": true,
 	"manifestPlusVersion": "1.1.0",
 	"minimumCoreVersion": "0.8.8",
-	"compatibleCoreVersion": "0.8.8",
+	"compatibleCoreVersion": "0.8.9",
 	"languages": [
 		{
 			"lang": "en",
