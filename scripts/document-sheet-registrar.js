@@ -66,7 +66,7 @@ export default class DocumentSheetRegistrar {
 	static settings = Object.fromEntries(
 		Object.entries(CONFIG)
 			.filter(this.filterDocs)
-			.map(([key, config]) => [key, false])
+			.map(([key, config]) => [key, true])
 	);
 
 	/**
