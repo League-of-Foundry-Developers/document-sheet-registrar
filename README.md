@@ -174,3 +174,9 @@ In order to give the user control of how their documents are rendered, documents
 If for some reason you need to prevent users from modifying this, you can hide the button with CSS by targeting the `.configure-sheet` class on the element.
 
 If it is important that documents created for your module only be rendered using sheets provided by your module, you may also want to restrict which sheets are available by setting a particular `type` for those sheets. You can specify an existing type for documents that support it, e.g. "script" Macros, or you can use the artificial types system discussed in the API section above. The sheet config dialog will only give the user the option to select a sheet that is valid for the type of the document being configured.
+
+# License
+
+This package is licensed under the MIT license, see LICENSE file for details. 
+
+Portions of the code are copied from Foundry VTT in accordance with the Foundry [LIMITED LICENSE AGREEMENT FOR MODULE DEVELOPMENT](https://foundryvtt.com/article/license/). These portions are *not* covered by the MIT license, but by the FOUNDRY VIRTUAL TABLETOP END USER LICENSE AGREEMENT. These portions of code are marked with code comments.
