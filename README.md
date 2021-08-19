@@ -40,7 +40,7 @@ Hooks.on("preDocumentSheetRegistrarInit", (settings) => {});
 Hooks.on("documentSheetRegistrarInit", (documentTypes) => {});
 ```
 
-The `preDocumentSheetRegistrarInit` hook passes an object of boolean "settings", you must set the setting coresponding to the document type that you wish to register a sheet for to `true`. If you do not do this, the registration method will not be created which will produce an error when you call it.
+The `preDocumentSheetRegistrarInit` hook passes an object of boolean "settings", you must set the setting corresponding to the document type that you wish to register a sheet for to `true`. If you do not do this, the registration method will not be created which will produce an error when you call it.
 
 The `documentSheetRegistrarInit` hook indicates that the initialization process has been completed, and it is now safe to register your sheets. This hook also passes an object of data about any documents for which this library has been enabled. 
 
@@ -157,7 +157,7 @@ DocType.registerSheet?.("myModule", SheetApplicationClass, {
 });
 ```
 
-When you register a sheet in this way, the sheet will only be avaialble to documents with the specified type. Since the `object.data.type` property is part of the official schema of the document, we can not add this property to docuemnts that don't already support it, or give it a custom value. Instead, DSR uses a `type ` flag in the `_document-sheet-registrar` scope to specifiy the artificial type.
+When you register a sheet in this way, the sheet will only be available to documents with the specified type. Since the `object.data.type` property is part of the official schema of the document, we can not add this property to documents that don't already support it, or give it a custom value. Instead, DSR uses a `type` flag in the `_document-sheet-registrar` scope to specify the artificial type.
 
 ```js
 document.setFlag("_document-sheet-registrar", "type", "my-type")
@@ -165,12 +165,12 @@ document.setFlag("_document-sheet-registrar", "type", "my-type")
 
 This will cause the `object.type` getter on the document to return the value stored in this flag, resulting in a different selection of sheets which are specific to that `type`.
 
-Note that if no sheet is registered to handle a given document and type, an error will occur. When this happens with the library enabled, a UI wanring is displayed. When the library is disabled, the default sheet for that document will render.
+Note that if no sheet is registered to handle a given document and type, an error will occur. When this happens with the library enabled, a UI warning is displayed. When the library is disabled, the default sheet for that document will render.
 
 ## The Sheet Config Dialog
 
 In order to give the user control of how their documents are rendered, documents that have multiple registered sheets will now have a "⚙ sheet" button in the header of their sheet application. This button opens the same sheet dialog that is used by Actor and Item.
 
-If for some reason you need to prevent users from modifying this, you can hide the button with CSS by targetting the `.configure-sheet` class on the element.
+If for some reason you need to prevent users from modifying this, you can hide the button with CSS by targeting the `.configure-sheet` class on the element.
 
-If it is important that documents created for your module only be rendered using sheets provided by your module, you may also want to restrict which sheets are avaialble by setting a particular `type` for those sheets. You can specify an existing type for documents that support it, e.g. "script" Macros, or you can use the artificial types system discussed in the API section above. The sheet config dialog will only give the user the option to select a sheet that is valid for the type of the document being configured.
+If it is important that documents created for your module only be rendered using sheets provided by your module, you may also want to restrict which sheets are available by setting a particular `type` for those sheets. You can specify an existing type for documents that support it, e.g. "script" Macros, or you can use the artificial types system discussed in the API section above. The sheet config dialog will only give the user the option to select a sheet that is valid for the type of the document being configured.
