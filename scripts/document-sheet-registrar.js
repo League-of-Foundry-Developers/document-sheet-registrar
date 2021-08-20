@@ -33,6 +33,15 @@ export default class DocumentSheetRegistrar {
 
 
 	/**
+	 * Names of documents that should always be updated even if they are disabled
+	 *
+	 * @static
+	 * @memberof DocumentSheetRegistrar
+	 */
+	static alwaysUpdate = ["Actor", "Item"];
+
+
+	/**
 	 * A function to filter the CONFIG...Document object for only 
 	 * documents that have either the sheetClass or sheetClasses property
 	 * and have a collection.
@@ -58,6 +67,9 @@ export default class DocumentSheetRegistrar {
 	 * A list of booleans for each document type that indicates whether
 	 * or not the sheet registration is enabled.
 	 *
+	 * DEBUG: Setting the Boolean in the last line to `true` will
+	 * enable all documents, this may be useful for debugging.
+	 *
 	 * @type {object<string, boolean>}
 	 *
 	 * @static
@@ -66,7 +78,7 @@ export default class DocumentSheetRegistrar {
 	static settings = Object.fromEntries(
 		Object.entries(CONFIG)
 			.filter(this.filterDocs)
-			.map(([key, config]) => [key, true])
+			.map(([key, config]) => [key, false])
 	);
 
 	/**
@@ -408,7 +420,14 @@ export default class DocumentSheetRegistrar {
 	 */
 	static updateDefaultSheets(setting = {}) {
 		if (!Object.keys(setting).length) return;
-		const documents = DocumentSheetRegistrar.documentTypes.filter(doc => doc.enabled).map(doc => doc.name);
+
+		// Get a list of document names that the updater should dun on
+		const documents = DocumentSheetRegistrar.documentTypes
+			// Enabled documents, and any that are always updated like Actor or Item
+			.filter(doc => doc.enabled || DocumentSheetRegistrar.alwaysUpdate.includes(doc.name))
+			// We just need an array of the names
+			.map(doc => doc.name);
+
 		for (let documentName of documents) {
 			const cfg = CONFIG[documentName];
 			const classes = cfg.sheetClasses;
