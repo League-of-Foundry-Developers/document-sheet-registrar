@@ -52,9 +52,6 @@ export default class DocumentSheetRegistrar {
 	static init() {
 		console.log(game.i18n.localize("Document Sheet Registrar: initializing..."));
 
-		// Call settings hook for this module
-		Hooks.callAll("preDocumentSheetRegistrarInit", this.settings);
-
 		// Initialize all of the document sheet registrars
 		for (let doc of Object.values(foundry.documents)) {
 			this.setupTypes(doc);
