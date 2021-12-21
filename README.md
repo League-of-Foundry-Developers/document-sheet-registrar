@@ -5,19 +5,69 @@
 
 ## Why does this exist?
 
+### Prior to v9
 - Replacing the Journal Sheet is difficult to do in a way which is compatible with both Foundry Core and other modules/systems which replace Journal Sheets.
 - Styling a particular journal entry (or kind of entry, e.g. from a particular module) is difficult to do in a way which does not conflict with other modules.
 - Modules which alter the display of Journal Entries would like a predictable way to do so, which is hard when different modules use different approaches to work around the issues above.
 
 [This issue](https://gitlab.com/foundrynet/foundryvtt/-/issues/4994) outlines a generic request that if implemented would allow Journal (and other document) "sheets" to be registered just like Actor sheets.
 
+### Post v9
+This module continues to provide a means for modules to keep their custom sheets from allying to documents that they should not be. For example, a `JournalEntry` sheet that *should* be used for a special loot list, but shouldn't be used for *normal* journal entries.
 
 ## Objective
+
+### Prior to v9
 Our goal with this library is to offer a way to leverage this missing API as Foundry Gaming considers implementing this solution in Core.
 
 You should consider using this module if you replace or drastically modify one of the compatible Document Sheets in a module and want your module to be compatible with other modules and systems which do the same.
 
 Note that systems are encouraged to override the base sheet in CONFIG and should not need to use this library.
+
+### Setting which sheet your Document opens with.
+
+The core flag `sheetClass` on the document will establish which registered sheet to use when opening.
+
+It can be set in [any of the ways a flag can be set](https://foundryvtt.wiki/en/development/guides/handling-data#flags).
+```js
+someJournalEntry.setFlag('core', 'sheetClass', 'my-module.MyModuleSheetClassName');
+```
+### Types
+
+This library introduces the ability to give documents "types" even for documents that did not support types before. The `object.type` property is supported on many documents in Core such as Actor (character, npc, vehicle), Item, Macro (script, chat), and others. This allows a document to have type-specific sheets such as NPC sheets vs. character sheets. With Document Sheet Registrar, we can add "artificial" types to any of the following nine do documents:
+
+- Actor
+- Item
+- JournalEntry
+- RollTable
+- Macro
+- Playlist
+- Scene
+- User
+- Folder
+
+There are two steps to adding a new artificial type. First, you must register a new sheet and pass your custom type as part of the `types` array:
+
+```javascript
+DocType.registerSheet?.("myModule", SheetApplicationClass, {
+  types: ["my-type"],
+  makeDefault: false,
+  label: "My document sheet"
+});
+```
+
+When you register a sheet in this way, the sheet will only be available to documents with the specified type. Since the `object.data.type` property is part of the official schema of the document, we can not add this property to documents that don't already support it, or give it a custom value. Instead, DSR uses a `type` flag in the `_document-sheet-registrar` scope to specify the artificial type.
+
+```js
+document.setFlag("_document-sheet-registrar", "type", "my-type")
+```
+
+This will cause the `object.type` getter on the document to return the value stored in this flag, resulting in a different selection of sheets which are specific to that `type`.
+
+Note that if no sheet is registered to handle a given document and type, an error will occur. When this happens with the library enabled, a UI warning is displayed. When the library is disabled, the default sheet for that document will render.
+
+# Pre v9 docs
+Most of the following only applies to versions of this module below 1.0.0, used in Foundry versions before v9.
 
 ## API
 Once this library is active (it should be activated at the start of the `init` hook), it enables the same API that Actor and Item documents use to register and unregister sheets for any Document Type in `CONFIG` which has both a `sheetClass` and a `collection`:
@@ -123,49 +173,6 @@ Journal.unregisterSheet?.("myModule", SheetApplicationClass, {
   types: ["base"],
 });
 ```
-
-
-### Setting which sheet your Document opens with.
-
-The core flag `sheetClass` on the document will establish which registered sheet to use when opening.
-
-It can be set in [any of the ways a flag can be set](https://foundryvtt.wiki/en/development/guides/handling-data#flags).
-```js
-someJournalEntry.setFlag('core', 'sheetClass', 'my-module.MyModuleSheetClassName');
-```
-### Types
-
-This library introduces the ability to give documents "types" even for documents that did not support types before. The `object.type` property is supported on many documents in Core such as Actor (character, npc, vehicle), Item, Macro (script, chat), and others. This allows a document to have type-specific sheets such as NPC sheets vs. character sheets. With Document Sheet Registrar, we can add "artificial" types to any of the following nine do documents:
-
-- Actor
-- Item
-- JournalEntry
-- RollTable
-- Macro
-- Playlist
-- Scene
-- User
-- Folder
-
-There are two steps to adding a new artificial type. First, you must register a new sheet and pass your custom type as part of the `types` array:
-
-```javascript
-DocType.registerSheet?.("myModule", SheetApplicationClass, {
-  types: ["my-type"],
-  makeDefault: false,
-  label: "My document sheet"
-});
-```
-
-When you register a sheet in this way, the sheet will only be available to documents with the specified type. Since the `object.data.type` property is part of the official schema of the document, we can not add this property to documents that don't already support it, or give it a custom value. Instead, DSR uses a `type` flag in the `_document-sheet-registrar` scope to specify the artificial type.
-
-```js
-document.setFlag("_document-sheet-registrar", "type", "my-type")
-```
-
-This will cause the `object.type` getter on the document to return the value stored in this flag, resulting in a different selection of sheets which are specific to that `type`.
-
-Note that if no sheet is registered to handle a given document and type, an error will occur. When this happens with the library enabled, a UI warning is displayed. When the library is disabled, the default sheet for that document will render.
 
 ## The Sheet Config Dialog
 
