@@ -107,38 +107,6 @@ export default class DocumentSheetRegistrar {
 
 	/*********************************************************************************************/
 
-	
-	/**
-	 * Handles the getDocumentSheetHeaderButtons hook
-	 *
-	 * Adds a sheet configuration button to the header of the document sheet
-	 * for those sheets that have had this option added.
-	 *
-	 * @static
-	 * @param {DocumentSheet} sheet   - A document sheet that is being rendered
-	 * @param {object[]}      buttons - A list of button definitions for the header of the sheet
-	 * @memberof DocumentSheetRegistrar
-	 */
-	static getDocumentSheetHeaderButtons(sheet, buttons) {
-		// If the document name isn't in the set of documentTypes, do nothing
-		if (!this.documentTypes.some(doc => doc.name == sheet.object.documentName && doc.enabled)) return;
-
-		// If the document doesn't have multiple registered sheets for this type, do nothing
-		if (Object.entries(CONFIG[sheet.object.documentName]?.sheetClasses?.[sheet.object.type]).length < 2) return;
-
-		// If there is already a Sheet button, do nothing
-		if (buttons.includes(button => button.label == "Sheet")) return;
-
-		// Add the sheet configuration button to the start of the header button row
-		buttons.unshift({
-			label: "Sheet",
-			class: "configure-sheet",
-			icon: "fas fa-cog",
-			onclick: sheet._onConfigureSheet.bind(sheet)
-		});
-	}
-
-
 	/**
 	 * Handles the init hook
 	 *
@@ -498,6 +466,3 @@ export default class DocumentSheetRegistrar {
 
 // On init, create the nessesary configs and methods to enable the sheet config API
 Hooks.once("init", DocumentSheetRegistrar.init.bind(DocumentSheetRegistrar));
-
-// When a doc sheet is rendered, add a header button for sheet configuration
-//Hooks.on("getDocumentSheetHeaderButtons", DocumentSheetRegistrar.getDocumentSheetHeaderButtons.bind(DocumentSheetRegistrar));
