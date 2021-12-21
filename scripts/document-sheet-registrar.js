@@ -32,79 +32,6 @@ export default class DocumentSheetRegistrar {
 	static get name() { return "_document-sheet-registrar"; }
 
 
-	/**
-	 * Names of documents that should always be updated even if they are disabled
-	 *
-	 * @static
-	 * @memberof DocumentSheetRegistrar
-	 */
-	static alwaysUpdate = ["Actor", "Item"];
-
-
-	/**
-	 * A function to filter the CONFIG...Document object for only 
-	 * documents that have either the sheetClass or sheetClasses property
-	 * and have a collection.
-	 *
-	 * Since these properties can be getters, it can be dangerous to run the
-	 * getters this early in the init process. Instead, we use 
-	 * Object.getOwnPropertyDescriptors to check if the properties exist.
-	 *
-	 * @static
-	 * @param {[string, object]} [key, config] - The key and config object for the document type
-	 * @return {boolean}                         True if the document fits the criteria, false otherwise
-	 * @memberof DocumentSheetRegistrar
-	 */
-	static filterDocs([key, config]) {
-		return (   
-			Object.getOwnPropertyDescriptor(config, "sheetClass") || 
-			Object.getOwnPropertyDescriptor(config, "sheetClasses") 
-		) && config.collection;
-	}
-
-	
-	/**
-	 * A list of booleans for each document type that indicates whether
-	 * or not the sheet registration is enabled.
-	 *
-	 * DEBUG: Setting the Boolean in the last line to `true` will
-	 * enable all documents, this may be useful for debugging.
-	 *
-	 * @type {object<string, boolean>}
-	 *
-	 * @static
-	 * @memberof DocumentSheetRegistrar
-	 */
-	static settings = Object.fromEntries(
-		Object.entries(CONFIG)
-			.filter(this.filterDocs)
-			.map(([key, config]) => [key, false])
-	);
-
-	/**
-	 * @typedef {object} DocumentMap A map of document name, class, and collection
-	 * @property {string}              name       - The name of the document
-	 * @property {ClientDocumentMixin} class      - The class of the document
-	 * @property {WorldCollection}     collection - The collection of the document
-	 *//**
-	 * A mapping of document types and the classes that handle them.
-	 * @type {DocumentMap[]}
-	 */
-	static get documentTypes() {
-		return Object.entries(CONFIG)
-			.filter(this.filterDocs)
-			.map(([key, config]) => {
-				/** @return {DocumentMap} */
-				return {
-					name: key,
-					class: config.documentClass,
-					collection: config.collection,
-					enabled: this.settings[key]
-				}
-			});
-	}
-
-
 	/*********************************************************************************************/
 
 	/**
@@ -129,63 +56,13 @@ export default class DocumentSheetRegistrar {
 		Hooks.callAll("preDocumentSheetRegistrarInit", this.settings);
 
 		// Initialize all of the document sheet registrars
-		this.initializeDocumentSheets();
+		for (let doc of Object.values(foundry.documents)) {
+			this.setupTypes(doc);
+		}
 
-		// 
 		libWrapper.register("_document-sheet-registrar", "DocumentSheetConfig.registerSheet", DocumentSheetRegistrar.registerSheet, "WRAPPER");
 
-		// Add wrapper to ensure that the object.data.type is always set as exptcted
-		libWrapper.register("_document-sheet-registrar", "DocumentSheetConfig.prototype.getData", function (wrapped, ...args) {
-			this.object.data.type = this.object.type;
-			return wrapped(...args);
-		}, "WRAPPER");
-
 		console.log(game.i18n.localize("Document Sheet Registrar: ...ready!"));
-
-		// Call the init hook to alert modules that the registrar is ready
-		Hooks.callAll("documentSheetRegistrarInit", Object.fromEntries(
-			this.documentTypes.filter(doc => doc.enabled).map(doc => [doc.name, doc])
-		));
-	}
-
-
-	/**
-	 * Initialize all of the document sheet registrars.
-	 *
-	 * @static
-	 * @memberof DocumentSheetRegistrar
-	 */
-	static initializeDocumentSheets() {
-		for (let doc of this.documentTypes) {
-			// Skip documents that aren't enabled
-			if (doc.enabled) this.initializeDocumentSheet(doc);
-		}
-	}
-
-
-	/**
-	 * Set up the nessesary configuration objects and methods for
-	 * sheet registration of this document type.
-	 *
-	 * @static
-	 * @param {DocumentMap} doc - The type of document to add sheet registration to
-	 * @memberof DocumentSheetRegistrar
-	 */
-	static initializeDocumentSheet(doc) {
-		// Set up the type property for this document
-		this.setupTypes(doc);
-
-		// Override the sheet retrieval method for this document type
-		libWrapper.register("_document-sheet-registrar", `${doc.name}.prototype._getSheetClass`, this._getSheetClass, "OVERRIDE");
-
-		// Add sheet registration methods to the document collection
-		//this.addRegistrationMethods(doc);
-
-		// Configure the sheetClasses object for this document type
-		this.configureSheetClasses(doc);
-
-		// Redirect sheetClass
-		//this.redirectSheetClass(doc);
 	}
 
 	
@@ -199,78 +76,12 @@ export default class DocumentSheetRegistrar {
 	 * @memberof DocumentSheetRegistrar
 	 */
 	static setupTypes(doc) {
-		Object.defineProperty(doc.class.prototype, "type", {
-			get: function() {
+		if (doc.schema.schema.type) return;
+		Object.defineProperty(doc.schema.prototype, "type", {
+			get: function () {
 				// The type stored in the document data
-				return  this.data?.flags?.[DocumentSheetRegistrar.name]?.type || this.data?.type || CONST.BASE_DOCUMENT_TYPE;
+				return this.flags?.[DocumentSheetRegistrar.name]?.type || CONST.BASE_DOCUMENT_TYPE;
 			}
-		});
-	}
-
-
-	/**
-	 * Creates a new sheetClasses config object for this kind of document.
-	 *
-	 * @param {DocumentMap} doc - The kind of document to add a config object for
-	 * @memberof DocumentSheetRegistrar
-	 */
-	static configureSheetClasses(doc) {
-		if (!CONFIG[doc.name]?.sheetClasses)
-			CONFIG[doc.name].sheetClasses = { };
-
-		if (doc.class.metadata.types.length) {
-			for (let type of doc.class.metadata.types) {
-				this.configureSheetClassessByType(doc, type);
-			}
-		}
-
-		// "base" for documents that only have one type
-		this.configureSheetClassessByType(doc, CONST.BASE_DOCUMENT_TYPE);
-	}
-
-
-
-	/**
-	 * Creates a new sheetClasses config object for this document and type.
-	 *
-	 * @static
-	 * @param {DocumentMap} doc  - The kind of document to add a config object for
-	 * @param {string}      type - The name of the "type" for this document
-	 * @memberof DocumentSheetRegistrar
-	 */
-	static configureSheetClassessByType(doc, type) {
-		// If this config already exists, do nothing
-		if (CONFIG[doc.name].sheetClasses[type]) return;
-
-		CONFIG[doc.name].sheetClasses[type] = {                                
-			[doc.name]: {                        // Register the default sheet
-				id: doc.name,
-				default: true,                   // As the default
-				label: doc.name,
-				cls: CONFIG[doc.name].sheetClass
-			}
-		}
-	}
-
-
-	/**
-	 * Links the old sheetClass definition to the new 'base' default sheet definition
-	 *
-	 * big thanks to fvtt-lib-wrapper Rui Pinheiro for inspiring this
-	 *
-	 * @static
-	 * @param {DocumentMap} doc - The type of document to modify
-	 * @memberof DocumentSheetRegistrar
-	 */
-	static redirectSheetClass(doc) {
-		Object.defineProperty(CONFIG[doc.name], "sheetClass", {
-			get: function() { 
-				return CONFIG[doc.name].sheetClasses[CONST.BASE_DOCUMENT_TYPE][doc.name].cls
-			},
-			set: function (value) { 
-				CONFIG[doc.name].sheetClasses[CONST.BASE_DOCUMENT_TYPE][doc.name].cls = value
-			},
-			configurable: false
 		});
 	}
 
@@ -309,118 +120,11 @@ export default class DocumentSheetRegistrar {
 
 		wrapped(...args);
 	}
-
-	/**
-	 * Adds a register and unregister method to the document collection.
-	 *
-	 * @param {DocumentMap} doc
-	 * @memberof DocumentSheetRegistrar
-	 */
-	static addRegistrationMethods(doc) {
-		/**
-		* Register a sheet class as a candidate which can be used to display this document.
-		*
-		* @param {string}      scope                  Provide a unique namespace scope for this sheet
-		* @param {Application} sheetClass             A defined Application class used to render the sheet
-		* @param {Object}      options                Additional options used for sheet registration
-		* @param {string}     [options.label]         A human readable label for the sheet name, which will be localized
-		* @param {string[]}   [options.types]         An array of entity types for which this sheet should be used. When not specified, all types will be used. That does *not* include artificial types, if you are using artificial types you must specify them here.
-		* @param {boolean}    [options.makeDefault]   Whether to make this sheet the default for provided types
-		*
-		* @example
-		* Document.registerSheet?.("myModule", SheetApplicationClass, {
-		*     types: ["base"],
-		*     makeDefault: false,
-		*     label: "My Document sheet"
-		* });
-		*/
-		doc.collection.registerSheet = function (...args) {
-			const options = args[2];
-
-			const types = options?.types || doc.class?.metadata?.types || [CONST.BASE_DOCUMENT_TYPE];
-
-			for (let type of types) {
-				if (!Object.keys(CONFIG[doc.name].sheetClasses).some(key => key == type)) {
-					CONFIG[doc.name].sheetClasses[type] = {};
-				}
-			}
-
-			EntitySheetConfig.registerSheet(doc.class, ...args);
-		}
-
-		/**
-		* Unregister a sheet class, removing it from the list of available Applications to use for this document.
-		*
-		* @param {string} scope              Provide a unique namespace scope for this sheet
-		* @param {Application} sheetClass    A defined Application class used to render the sheet
-		* @param {Object} [options]          Additional options used for sheet registration
-		* @param {string[]} [options.types]  An Array of types for which this sheet should be removed
-		*
-		* @example
-		* Document.unregisterSheet?.("myModule", SheetApplicationClass, {
-		* 	types: ["base"],
-		* });
-		*/
-		doc.collection.unregisterSheet = function (...args) {
-			EntitySheetConfig.unregisterSheet(doc.class, ...args)
-		}
-	}
-
-
-	/*********************************************************************************************
-	 * This section contains code copied from the Foundry core software and modified for
-	 * this library.
-	 *
-	 * Foundry Virtual Tabletop © Copyright 2021, Foundry Gaming, LLC.
-	 * 
-	 * This code is used in accordance with the Foundry Virtual Tabletop 
-	 * LIMITED LICENSE AGREEMENT FOR MODULE DEVELOPMENT.
-	 *
-	 * https://foundryvtt.com/article/license/
-	 *
-	 *********************************************************************************************/
-
-	/**
-	 * Retrieve the sheet class for the document. @see Actor._getSheetClass
-	 *
-	 * @static
-	 * @return {*}
-	 * @memberof DocumentSheetRegistrar
-	 */
-	static _getSheetClass() {
-		const cfg = CONFIG[this.documentName];
-		const sheets = cfg.sheetClasses[this.type] || {};
-		const override = this.getFlag("core", "sheetClass");
-		if (sheets[override]) return sheets[override].cls;
-		const classes = Object.values(sheets);
-		if (!classes.length) {
-			ui.notifications.warn(
-				game.i18n.format("_document-sheet-registrar.ui.warn.no-sheet-found", { sheet: override })
-			);
-			return null;
-		}
-		return (classes.find(s => s.default) ?? classes.pop()).cls;
-	}
-
-	/**
-	 * Handle requests to configure the default sheet used by this Document
-	 * @private
-	 */
-	static _onConfigureSheet(event) {
-		event.preventDefault();
-		new EntitySheetConfig(this.object, {
-			top: this.position.top + 40,
-			left: this.position.left + ((this.position.width - 400) / 2)
-		}).render(true);
-	}
-
-	/*********************************************************************************************
-	 * 
-	 * END OF SECTION COPIED FROM FOUNDRY CORE SOFTWARE
-	 *
-	 *********************************************************************************************/
 }
 
 
 // On init, create the nessesary configs and methods to enable the sheet config API
 Hooks.once("init", DocumentSheetRegistrar.init.bind(DocumentSheetRegistrar));
+
+// Call the init hook to alert modules that the registrar is ready
+Hooks.once("ready", () => Hooks.callAll("documentSheetRegistrarInit"));
