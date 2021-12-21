@@ -131,14 +131,8 @@ export default class DocumentSheetRegistrar {
 		// Initialize all of the document sheet registrars
 		this.initializeDocumentSheets();
 
-		// Add a sheet config event handler for header buttons on DocumentSheet
-		//DocumentSheet.prototype._onConfigureSheet = this._onConfigureSheet;
-
 		// 
 		libWrapper.register("_document-sheet-registrar", "DocumentSheetConfig.registerSheet", DocumentSheetRegistrar.registerSheet, "WRAPPER");
-
-		// Add wrapper to update the default sheet config when settings are changed
-		libWrapper.register("_document-sheet-registrar", "DocumentSheetConfig.updateDefaultSheets", DocumentSheetRegistrar.updateDefaultSheets, "OVERRIDE");
 
 		// Add wrapper to ensure that the object.data.type is always set as exptcted
 		libWrapper.register("_document-sheet-registrar", "DocumentSheetConfig.prototype.getData", function (wrapped, ...args) {
@@ -418,42 +412,6 @@ export default class DocumentSheetRegistrar {
 			top: this.position.top + 40,
 			left: this.position.left + ((this.position.width - 400) / 2)
 		}).render(true);
-	}
-
-	/**
-	 * Update the currently default Sheets using a new core world setting
-	 * @param {object} setting
-	 */
-	static updateDefaultSheets(setting = {}) {
-		if (!Object.keys(setting).length) return;
-
-		// Get a list of document names that the updater should dun on
-		const documents = DocumentSheetRegistrar.documentTypes
-			// Enabled documents, and any that are always updated like Actor or Item
-			.filter(doc => doc.enabled || DocumentSheetRegistrar.alwaysUpdate.includes(doc.name))
-			// We just need an array of the names
-			.map(doc => doc.name);
-
-		for (let documentName of documents) {
-			const cfg = CONFIG[documentName];
-			const classes = cfg.sheetClasses;
-			const collection = cfg.collection.instance;
-			let defaults = setting[documentName] || {};
-			if (!defaults) continue;
-
-			// Update default preference for registered sheets
-			for (let [type, sheetId] of Object.entries(defaults)) {
-				const sheets = Object.values(classes[type] || {});
-				let requested = sheets.find(s => s.id === sheetId);
-				if (requested) sheets.forEach(s => s.default = s.id === sheetId);
-			}
-
-			// Close and de-register any existing sheets
-			for (let document of collection) {
-				Object.values(document.apps).forEach(app => app.close());
-				document.apps = {};
-			}
-		}
 	}
 
 	/*********************************************************************************************
