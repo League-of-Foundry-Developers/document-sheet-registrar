@@ -1,28 +1,15 @@
 import { libWrapper } from './libWrapperShim.js'
 
 /**
- * Creates a shim that allows for the registration of custom document sheets.
+ * Creates a shim that allows for the registration of custom document sheets
+ * using "made up" types to prevent the wrong sheet from being used with the 
+ * wrong documents.
  *
  * Requires libWrapper (or libWrapper shim).
- *
- * This method works the same as the @see Actor.registerSheet method,
- * which indirectly calls @see EntitySheetConfig.registerSheet
- *
- * The first argument is the "scope" or namespace of your sheet, and
- * the second argument is the class of the sheet itself. The third argument
- * is an object of additional data.
- *
- * @example
- * Journal.registerSheet?.("myModule", SheetApplicationClass, {
- *     types: ["base"],
- *     makeDefault: false,
- *     label: "My Journal Entry sheet"
- * });
- *
  */
 export default class DocumentSheetRegistrar {
 	/**
-	 * The name of the Document Sheet Registrar module module
+	 * The name of the Document Sheet Registrar module
 	 *
 	 * @type {string} 
 	 * @readonly
@@ -37,14 +24,7 @@ export default class DocumentSheetRegistrar {
 	/**
 	 * Handles the init hook
 	 *
-	 * Initializes all of the document sheet registrars,
-	 * then sets up some wrapper functions.
-	 * 
-	 * Calls a pre-init hook to allow modules to request certain 
-	 * sheet registration options.
-	 *
-	 * Finally calls a post-init hook to alert modules that the
-	 * document sheet registrar has been initialized.
+	 * Initializes all the types, and registers a wrapper on registerSheet
 	 *
 	 * @static
 	 * @memberof DocumentSheetRegistrar
@@ -64,7 +44,7 @@ export default class DocumentSheetRegistrar {
 
 	
 	/**
-	 * Ensures that the document has a type property, either a static 
+	 * Ensures that the document data has a type property, either a static 
 	 * "base" or a getter that returns the type.
 	 *
 	 * @static
