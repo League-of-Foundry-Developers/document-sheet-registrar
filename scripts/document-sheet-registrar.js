@@ -164,13 +164,16 @@ export default class DocumentSheetRegistrar {
 		this.initializeDocumentSheets();
 
 		// Add a sheet config event handler for header buttons on DocumentSheet
-		DocumentSheet.prototype._onConfigureSheet = this._onConfigureSheet;
+		//DocumentSheet.prototype._onConfigureSheet = this._onConfigureSheet;
+
+		// 
+		libWrapper.register("_document-sheet-registrar", "DocumentSheetConfig.registerSheet", DocumentSheetRegistrar.registerSheet, "WRAPPER");
 
 		// Add wrapper to update the default sheet config when settings are changed
-		libWrapper.register("_document-sheet-registrar", "EntitySheetConfig.updateDefaultSheets", DocumentSheetRegistrar.updateDefaultSheets, "OVERRIDE");
+		libWrapper.register("_document-sheet-registrar", "DocumentSheetConfig.updateDefaultSheets", DocumentSheetRegistrar.updateDefaultSheets, "OVERRIDE");
 
 		// Add wrapper to ensure that the object.data.type is always set as exptcted
-		libWrapper.register("_document-sheet-registrar", "EntitySheetConfig.prototype.getData", function (wrapped, ...args) {
+		libWrapper.register("_document-sheet-registrar", "DocumentSheetConfig.prototype.getData", function (wrapped, ...args) {
 			this.object.data.type = this.object.type;
 			return wrapped(...args);
 		}, "WRAPPER");
@@ -214,13 +217,13 @@ export default class DocumentSheetRegistrar {
 		libWrapper.register("_document-sheet-registrar", `${doc.name}.prototype._getSheetClass`, this._getSheetClass, "OVERRIDE");
 
 		// Add sheet registration methods to the document collection
-		this.addRegistrationMethods(doc);
+		//this.addRegistrationMethods(doc);
 
 		// Configure the sheetClasses object for this document type
 		this.configureSheetClasses(doc);
 
 		// Redirect sheetClass
-		this.redirectSheetClass(doc);
+		//this.redirectSheetClass(doc);
 	}
 
 	
@@ -237,7 +240,7 @@ export default class DocumentSheetRegistrar {
 		Object.defineProperty(doc.class.prototype, "type", {
 			get: function() {
 				// The type stored in the document data
-				return  this.data?.flags?.[DocumentSheetRegistrar.name]?.type || this.data?.type || CONST.BASE_ENTITY_TYPE;
+				return  this.data?.flags?.[DocumentSheetRegistrar.name]?.type || this.data?.type || CONST.BASE_DOCUMENT_TYPE;
 			}
 		});
 	}
@@ -260,7 +263,7 @@ export default class DocumentSheetRegistrar {
 		}
 
 		// "base" for documents that only have one type
-		this.configureSheetClassessByType(doc, CONST.BASE_ENTITY_TYPE);
+		this.configureSheetClassessByType(doc, CONST.BASE_DOCUMENT_TYPE);
 	}
 
 
@@ -300,15 +303,50 @@ export default class DocumentSheetRegistrar {
 	static redirectSheetClass(doc) {
 		Object.defineProperty(CONFIG[doc.name], "sheetClass", {
 			get: function() { 
-				return CONFIG[doc.name].sheetClasses[CONST.BASE_ENTITY_TYPE][doc.name].cls
+				return CONFIG[doc.name].sheetClasses[CONST.BASE_DOCUMENT_TYPE][doc.name].cls
 			},
 			set: function (value) { 
-				CONFIG[doc.name].sheetClasses[CONST.BASE_ENTITY_TYPE][doc.name].cls = value
+				CONFIG[doc.name].sheetClasses[CONST.BASE_DOCUMENT_TYPE][doc.name].cls = value
 			},
 			configurable: false
 		});
 	}
 
+	/**
+	 * Register a sheet class as a candidate which can be used to display documents of a given type
+	 *
+	 * @wrapper `DocumentSheetConfig.registerSheet`
+	 *
+	 * @param {Function} wrapped                 The original function which has been wrapped
+	 * @param {Function} documentClass           The Document class for which to register a new Sheet option
+	 * @param {string} scope                     Provide a unique namespace scope for this sheet
+	 * @param {Application} sheetClass           A defined Application class used to render the sheet
+	 * @param {Object} options                   Additional options used for sheet registration
+	 * @param {string|function} [options.label]  A human readable label for the sheet name, which will be localized
+	 * @param {string[]} [options.types]         An array of document types for which this sheet should be used
+	 * @param {boolean} [options.makeDefault]    Whether to make this sheet the default for provided types
+	 *
+	 * @example
+	 * DocumentSheetConfig.registerSheet?.(DocumentClass, "myModule", SheetApplicationClass, {
+	 *     types: ["base"],
+	 *     makeDefault: false,
+	 *     label: "My Document sheet"
+	 * });
+	 */
+	static registerSheet(wrapped, ...args) {
+		const classRef = args[0];
+		const options = args[3];
+
+		const types = options?.types || classRef.metadata?.types || [CONST.BASE_DOCUMENT_TYPE];
+
+		for (let type of types) {
+			if (!Object.keys(CONFIG[classRef.documentName].sheetClasses).some(key => key == type)) {
+				CONFIG[classRef.documentName].sheetClasses[type] = {};
+			}
+		}
+
+		wrapped(...args);
+	}
 
 	/**
 	 * Adds a register and unregister method to the document collection.
@@ -337,7 +375,7 @@ export default class DocumentSheetRegistrar {
 		doc.collection.registerSheet = function (...args) {
 			const options = args[2];
 
-			const types = options?.types || doc.class?.metadata?.types || [CONST.BASE_ENTITY_TYPE];
+			const types = options?.types || doc.class?.metadata?.types || [CONST.BASE_DOCUMENT_TYPE];
 
 			for (let type of types) {
 				if (!Object.keys(CONFIG[doc.name].sheetClasses).some(key => key == type)) {
@@ -462,4 +500,4 @@ export default class DocumentSheetRegistrar {
 Hooks.once("init", DocumentSheetRegistrar.init.bind(DocumentSheetRegistrar));
 
 // When a doc sheet is rendered, add a header button for sheet configuration
-Hooks.on("getDocumentSheetHeaderButtons", DocumentSheetRegistrar.getDocumentSheetHeaderButtons.bind(DocumentSheetRegistrar));
+//Hooks.on("getDocumentSheetHeaderButtons", DocumentSheetRegistrar.getDocumentSheetHeaderButtons.bind(DocumentSheetRegistrar));
